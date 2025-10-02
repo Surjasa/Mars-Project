@@ -1,0 +1,11 @@
+# Ignore entire .vscode folder except specific files
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+!.vscode/launch.json
+
+# Ignore node_modules
+node_modules/
+
+# Ignore logs
+*.log

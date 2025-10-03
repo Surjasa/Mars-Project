@@ -143,12 +143,18 @@ class MarsRecyclingGame {
             { x: 400, y: 250, width: 150, height: 100, type: 'greenhouse', name: 'Greenhouse' }
         ];
 
+        this.initializeStoryDialogs();
         this.init();
     }
 
     init() {
         this.updateUI();
         this.renderHabitat();
+
+        // Show story dialog on game start
+        setTimeout(() => {
+            this.showStoryDialog();
+        }, 1000);
         this.generateRecyclingOptions();
         this.createAtmosphericEffects();
         this.generateCrewPortraits();
@@ -156,16 +162,16 @@ class MarsRecyclingGame {
         this.setBackground();
         // Load the Mars landscape image
         this.loadBackgroundImage('mars.png');
-        
+
         this.startAnimationLoop();
-    
+
         // Start intervals
         setInterval(() => this.generateDailyWaste(), 10000); // Every 10 seconds = 1 Sol
         setInterval(() => this.advanceDay(), 10000);
         setInterval(() => this.addCrewNarrative(), 15000); // Crew messages every 15 seconds
         setInterval(() => this.updateCrewActivities(), 8000); // Update crew activities every 8 seconds
     }
-    
+
     // 👉 New method inside your class
     setBackground() {
         const button = document.getElementById("toggleBackgroundControls");
@@ -181,11 +187,11 @@ class MarsRecyclingGame {
                     button.textContent = "🎨 Show Background Controls";
                 }
             });
-        
+
         }
     }
-    
-    
+
+
     createAtmosphericEffects() {
         // Add floating dust particles to the page
         const dustContainer = document.createElement('div');
@@ -266,6 +272,9 @@ class MarsRecyclingGame {
 
         // Add processing visual effect
         this.triggerProcessingEffect();
+
+        // Check for mission completion
+        this.checkMissionCompletion();
 
         this.updateUI();
         this.generateRecyclingOptions();
@@ -353,7 +362,7 @@ class MarsRecyclingGame {
 
         // Check for critical resource warnings
         this.checkResourceWarnings();
-        
+
         // Update crew portraits
         this.updateCrewPortraits();
     }
@@ -403,7 +412,7 @@ class MarsRecyclingGame {
             this.ctx.fillRect(0, 0, this.canvas.width, 350);
         }
 
-        
+
         // Draw realistic Mars terrain and rock formations
         this.drawMartianLandscape();
 
@@ -809,6 +818,166 @@ class MarsRecyclingGame {
         }, 3000);
     }
 
+    // Story dialog system
+    initializeStoryDialogs() {
+        this.storyDialogs = [
+            {
+                title: "Mars Colony Mission Brief",
+                content: "Welcome to Mars Colony Alpha, Commander. You are part of humanity's first permanent settlement on the Red Planet.",
+                speaker: "Mission Control",
+                icon: "🚀"
+            },
+            {
+                title: "The Challenge",
+                content: "Our supply lines from Earth are limited and expensive. Every resource must be carefully managed and recycled to ensure our survival.",
+                speaker: "Colony Administrator",
+                icon: "⚠️"
+            },
+            {
+                title: "Your Mission",
+                content: "As the Recycling Operations Manager, your task is to transform waste materials into useful products that will sustain our colony.",
+                speaker: "Chief Engineer",
+                icon: "🔧"
+            },
+            {
+                title: "The Process",
+                content: "Collect various waste items, process them through our recycling systems, and create essential supplies for the colony's continued operation.",
+                speaker: "Resource Specialist",
+                icon: "♻️"
+            },
+            {
+                title: "Success Criteria",
+                content: "Successfully recycle materials to create tools, building components, and life support supplies. The colony's future depends on your efficiency!",
+                speaker: "Mission Commander",
+                icon: "🎯"
+            }
+        ];
+        this.currentDialogIndex = 0;
+        this.gameStarted = false;
+        this.missionCompleted = false;
+    }
+
+    showStoryDialog() {
+        if (this.currentDialogIndex >= this.storyDialogs.length) {
+            this.startGame();
+            return;
+        }
+
+        const dialog = this.storyDialogs[this.currentDialogIndex];
+        const dialogElement = document.createElement('div');
+        dialogElement.className = 'story-dialog-overlay';
+
+        dialogElement.innerHTML = `
+            <div class="story-dialog">
+                <div class="dialog-header">
+                    <div class="dialog-icon">${dialog.icon}</div>
+                    <div class="dialog-title-section">
+                        <h2 class="dialog-title">${dialog.title}</h2>
+                        <p class="dialog-speaker">${dialog.speaker}</p>
+                    </div>
+                    <div class="dialog-controls">
+                        <span class="dialog-counter">${this.currentDialogIndex + 1}/${this.storyDialogs.length}</span>
+                    </div>
+                </div>
+                <div class="dialog-content">
+                    <p>${dialog.content}</p>
+                </div>
+                <div class="dialog-footer">
+                    ${this.currentDialogIndex < this.storyDialogs.length - 1 ?
+                '<button class="dialog-btn next-btn">Next</button>' :
+                '<button class="dialog-btn close-btn">Start Mission</button>'
+            }
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(dialogElement);
+
+        // Add event listeners
+        const nextBtn = dialogElement.querySelector('.next-btn');
+        const closeBtn = dialogElement.querySelector('.close-btn');
+
+        if (nextBtn) {
+            nextBtn.addEventListener('click', () => {
+                dialogElement.remove();
+                this.currentDialogIndex++;
+                this.showStoryDialog();
+            });
+        }
+
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
+                dialogElement.remove();
+                this.startGame();
+            });
+        }
+    }
+
+    startGame() {
+        this.gameStarted = true;
+        this.showNotification('🎮 Mission started! Begin collecting and recycling waste materials.');
+    }
+
+    checkMissionCompletion() {
+        if (!this.gameStarted || this.missionCompleted) return;
+
+        // Mission completion criteria: create at least 2 different types of products with minimum quantities
+        const productTypes = Object.keys(this.products);
+        const completedProducts = productTypes.filter(product => this.products[product] >= 3);
+
+        // Check if player has created at least 3 different product types with sufficient quantities
+        if (completedProducts.length >= 3) {
+            this.missionCompleted = true;
+            setTimeout(() => {
+                this.showMissionSuccess();
+            }, 2000); // Delay to let the last notification show
+        }
+    }
+
+    showMissionSuccess() {
+        const dialogElement = document.createElement('div');
+        dialogElement.className = 'story-dialog-overlay';
+
+        dialogElement.innerHTML = `
+            <div class="story-dialog success-dialog">
+                <div class="dialog-header">
+                    <div class="dialog-icon">🏆</div>
+                    <div class="dialog-title-section">
+                        <h2 class="dialog-title">Mission Successful!</h2>
+                        <p class="dialog-speaker">Colony Command</p>
+                    </div>
+                </div>
+                <div class="dialog-content">
+                    <p>Congratulations, Commander! Your exceptional recycling operations have secured the colony's future. You have successfully transformed waste into valuable resources, ensuring our survival on Mars.</p>
+                    <div class="success-stats">
+                        <div class="stat-item">
+                            <span class="stat-icon">♻️</span>
+                            <span>Materials Recycled</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-icon">🔧</span>
+                            <span>Products Created</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-icon">🌟</span>
+                            <span>Colony Sustained</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="dialog-footer">
+                    <button class="dialog-btn close-btn">Continue Operations</button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(dialogElement);
+
+        const closeBtn = dialogElement.querySelector('.close-btn');
+        closeBtn.addEventListener('click', () => {
+            dialogElement.remove();
+        });
+    }
+
     // Helper functions for color manipulation
     lightenColor(color, percent) {
         const num = parseInt(color.replace("#", ""), 16);
@@ -869,7 +1038,7 @@ class MarsRecyclingGame {
         };
         animate();
     }
-    
+
     // Crew management methods
     generateCrewPortraits() {
         const container = document.getElementById('crew-portraits');
@@ -895,12 +1064,12 @@ class MarsRecyclingGame {
         this.crewMembers.forEach(member => {
             const memberElement = document.getElementById(`crew-${member.id}`);
             const statusElement = document.getElementById(`status-${member.id}`);
-            
+
             if (memberElement && statusElement) {
                 // Update status display
                 statusElement.textContent = member.status;
                 statusElement.className = `crew-status ${member.status}`;
-                
+
                 // Update member element class
                 memberElement.className = `crew-member ${member.type} ${member.status}`;
             }
@@ -910,83 +1079,85 @@ class MarsRecyclingGame {
     updateCrewActivities() {
         const activities = {
             commander: [
-                'Monitoring systems', 'Reviewing reports', 'Planning operations', 
+                'Monitoring systems', 'Reviewing reports', 'Planning operations',
                 'Coordinating crew', 'System diagnostics', 'Mission planning'
             ],
             scientist: [
-                'Research analysis', 'Data collection', 'Sample testing', 
+                'Research analysis', 'Data collection', 'Sample testing',
                 'Experiment setup', 'Lab maintenance', 'Report writing'
             ],
             engineer: [
-                'Equipment maintenance', 'System repairs', 'Tool calibration', 
+                'Equipment maintenance', 'System repairs', 'Tool calibration',
                 'Module inspection', 'Power optimization', 'Recycling oversight'
             ],
             biologist: [
-                'Greenhouse monitoring', 'Plant cultivation', 'Air quality check', 
+                'Greenhouse monitoring', 'Plant cultivation', 'Air quality check',
                 'Ecosystem analysis', 'Seed preparation', 'Growth tracking'
             ]
         };
 
+        // Update each crew member's activity
         this.crewMembers.forEach(member => {
-            // Randomly update activity
-            if (Math.random() < 0.4) {
-                const typeActivities = activities[member.type];
-                member.activity = typeActivities[Math.floor(Math.random() * typeActivities.length)];
+            if (member.status === 'active' && activities[member.type]) {
+                const memberActivities = activities[member.type];
+                const randomActivity = memberActivities[Math.floor(Math.random() * memberActivities.length)];
+                member.activity = randomActivity;
                 member.lastActivity = Date.now();
-                
-                // Randomly change status
-                const statusChance = Math.random();
-                if (statusChance < 0.7) {
-                    member.status = 'active';
-                } else if (statusChance < 0.9) {
-                    member.status = 'busy';
-                } else {
-                    member.status = 'critical';
-                }
             }
         });
+
+        // Update the UI to reflect new activities
+        this.updateCrewPortraits();
     }
 
     getCrewMemberByName(name) {
-        return this.crewMembers.find(member => 
+        return this.crewMembers.find(member =>
             member.name.toLowerCase() === name.toLowerCase()
         );
     }
 
     // Enhanced narrative system with crew member context
-    addCrewNarrative() {
+    addCrewNarrativeEnhanced() {
         const narrativeTemplates = [
-            { speaker: 'chen', messages: [
-                'The recycling bay is running efficiently. Great work!',
-                'Every piece of waste turned into something useful keeps us alive out here.',
-                'Mission status is green. Keep up the excellent work, team.',
-                'Resource management is critical. Stay focused on efficiency.'
-            ]},
-            { speaker: 'rodriguez', messages: [
-                'We could use more insulation in the greenhouse module.',
-                'The crew morale is high - nothing like turning trash into treasure!',
-                'My analysis shows our recycling efficiency has improved 15%.',
-                'The atmospheric readings are stable thanks to our air filters.'
-            ]},
-            { speaker: 'kim', messages: [
-                'Those new storage containers are perfect for the lab equipment.',
-                'These composite materials are stronger than anything we brought from Earth.',
-                'I\'ve optimized the recycling systems for better power efficiency.',
-                'The fabrication units are running at peak performance.'
-            ]},
-            { speaker: 'park', messages: [
-                'The air recycling system is working beautifully with our new filters.',
-                'Plant growth has increased 20% with the improved growing medium.',
-                'The ecosystem balance is perfect - our waste-to-resource cycle is working.',
-                'Oxygen production is up thanks to the enhanced plant containers.'
-            ]}
+            {
+                speaker: 'chen', messages: [
+                    'The recycling bay is running efficiently. Great work!',
+                    'Every piece of waste turned into something useful keeps us alive out here.',
+                    'Mission status is green. Keep up the excellent work, team.',
+                    'Resource management is critical. Stay focused on efficiency.'
+                ]
+            },
+            {
+                speaker: 'rodriguez', messages: [
+                    'We could use more insulation in the greenhouse module.',
+                    'The crew morale is high - nothing like turning trash into treasure!',
+                    'My analysis shows our recycling efficiency has improved 15%.',
+                    'The atmospheric readings are stable thanks to our air filters.'
+                ]
+            },
+            {
+                speaker: 'kim', messages: [
+                    'Those new storage containers are perfect for the lab equipment.',
+                    'These composite materials are stronger than anything we brought from Earth.',
+                    'I\'ve optimized the recycling systems for better power efficiency.',
+                    'The fabrication units are running at peak performance.'
+                ]
+            },
+            {
+                speaker: 'park', messages: [
+                    'The air recycling system is working beautifully with our new filters.',
+                    'Plant growth has increased 20% with the improved growing medium.',
+                    'The ecosystem balance is perfect - our waste-to-resource cycle is working.',
+                    'Oxygen production is up thanks to the enhanced plant containers.'
+                ]
+            }
         ];
 
         if (Math.random() < 0.3) {
             const template = narrativeTemplates[Math.floor(Math.random() * narrativeTemplates.length)];
             const message = template.messages[Math.floor(Math.random() * template.messages.length)];
             const speaker = this.getCrewMemberByName(template.speaker);
-            
+
             if (speaker) {
                 // Temporarily highlight the speaking crew member
                 this.highlightCrewMember(speaker.id);
@@ -1000,7 +1171,7 @@ class MarsRecyclingGame {
         if (memberElement) {
             memberElement.style.boxShadow = '0 0 20px rgba(0, 255, 0, 0.6)';
             memberElement.style.transform = 'scale(1.05)';
-            
+
             setTimeout(() => {
                 memberElement.style.boxShadow = '';
                 memberElement.style.transform = '';
@@ -1010,7 +1181,7 @@ class MarsRecyclingGame {
 
     drawCrewInModules() {
         const time = Date.now() * 0.002;
-        
+
         // Assign crew members to modules based on their roles
         const crewAssignments = [
             { member: this.crewMembers[0], module: this.modules[0] }, // Commander in Living Quarters
@@ -1021,16 +1192,16 @@ class MarsRecyclingGame {
 
         crewAssignments.forEach((assignment, index) => {
             const { member, module } = assignment;
-            
+
             // Calculate crew member position with slight movement
             const centerX = module.x + module.width / 2;
             const centerY = module.y + module.height / 2;
             const offsetX = Math.sin(time + index) * 3;
             const offsetY = Math.cos(time + index * 0.7) * 2;
-            
+
             // Draw crew member as a small animated figure
             this.ctx.save();
-            
+
             // Body
             this.ctx.fillStyle = this.getCrewColor(member.type);
             this.ctx.shadowColor = this.getCrewColor(member.type);
@@ -1038,14 +1209,14 @@ class MarsRecyclingGame {
             this.ctx.beginPath();
             this.ctx.arc(centerX + offsetX, centerY + offsetY, 4, 0, Math.PI * 2);
             this.ctx.fill();
-            
+
             // Helmet glow
             this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
             this.ctx.lineWidth = 1;
             this.ctx.beginPath();
             this.ctx.arc(centerX + offsetX, centerY + offsetY, 5, 0, Math.PI * 2);
             this.ctx.stroke();
-            
+
             // Activity indicator
             if (member.status === 'busy') {
                 this.ctx.fillStyle = '#FFA500';
@@ -1058,7 +1229,7 @@ class MarsRecyclingGame {
                 this.ctx.arc(centerX + offsetX + 6, centerY + offsetY - 6, 2, 0, Math.PI * 2);
                 this.ctx.fill();
             }
-            
+
             this.ctx.restore();
         });
     }
@@ -1086,20 +1257,33 @@ class MarsRecyclingGame {
         // Add active class to selected nav item and panel
         const navItem = document.querySelector(`[data-panel="${panelId}"]`);
         const panel = document.getElementById(panelId);
-        
+
         if (navItem && panel) {
             navItem.classList.add('active');
             panel.classList.add('active');
-            
+
             // Show notification about panel switch
             const panelNames = {
                 'crew-section': 'Crew Status',
                 'waste-inventory': 'Waste Inventory',
                 'recycling-options': 'Recycling Systems',
-                'products-inventory': 'Products'
+                'products-inventory': 'Products',
+                'background-controls': 'Background Settings'
             };
-            
+
             this.showNotification(`📋 Switched to: ${panelNames[panelId]}`);
+        }
+    }
+
+    // Toggle sidebar visibility
+    toggleSidebar() {
+        const controlPanel = document.getElementById('control-panel');
+        controlPanel.classList.toggle('collapsed');
+
+        if (controlPanel.classList.contains('collapsed')) {
+            this.showNotification('📋 Sidebar collapsed');
+        } else {
+            this.showNotification('📋 Sidebar expanded');
         }
     }
 
@@ -1121,14 +1305,14 @@ class MarsRecyclingGame {
         if (this.backgroundLoaded && this.backgroundImage) {
             // Draw the background image to fit the canvas
             this.ctx.drawImage(this.backgroundImage, 0, 0, this.canvas.width, this.canvas.height);
-            
+
             // Add atmospheric overlay to blend with game elements
             const overlay = this.ctx.createLinearGradient(0, 0, 0, this.canvas.height);
             overlay.addColorStop(0, 'rgba(230, 184, 138, 0.1)');
             overlay.addColorStop(0.3, 'rgba(196, 149, 107, 0.05)');
             overlay.addColorStop(0.7, 'rgba(139, 69, 19, 0.1)');
             overlay.addColorStop(1, 'rgba(101, 67, 33, 0.2)');
-            
+
             this.ctx.fillStyle = overlay;
             this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         }

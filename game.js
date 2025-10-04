@@ -825,7 +825,7 @@ class MarsRecyclingGame {
                 title: "Mars Colony Mission Brief",
                 content: "Welcome to Mars Colony Alpha, Commander. You are part of humanity's first permanent settlement on the Red Planet.",
                 speaker: "Mission Control",
-                icon: "🚀"
+                icon: ""
             },
             {
                 title: "The Challenge",
@@ -869,6 +869,7 @@ class MarsRecyclingGame {
 
         dialogElement.innerHTML = `
             <div class="story-dialog">
+                <img src="mar2.png" class="character-image" alt="Mars Astronaut" />
                 <div class="dialog-header">
                     <div class="dialog-icon">${dialog.icon}</div>
                     <div class="dialog-title-section">
@@ -940,6 +941,7 @@ class MarsRecyclingGame {
 
         dialogElement.innerHTML = `
             <div class="story-dialog success-dialog">
+                <img src="mar2.png" class="character-image success-character" alt="Mars Astronaut" />
                 <div class="dialog-header">
                     <div class="dialog-icon">🏆</div>
                     <div class="dialog-title-section">

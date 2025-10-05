@@ -11,7 +11,7 @@ class MarsRecyclingGame {
         this.sol = 1;
         this.crew = 4;
         this.power = 100;
-        this.water = 85;
+        this.water = 100;
 
         // Waste inventory
         this.waste = {
@@ -29,47 +29,75 @@ class MarsRecyclingGame {
             containers: 0,
             composites: 0,
             tools: 0,
-            cushioning: 0
+            cushioning: 0,
+            dustTraps: 0,
+            airFilters: 0,
+            solarCells: 0,
+            waterRecyclers: 0,
+            communicationDevices: 0,
+            birthdayDecorations: 0,
+            partyContainers: 0,
+            partyBalloons: 0
         };
 
         // Recycling systems
         this.recyclingSystems = [
             {
-                id: 'fabric-to-insulation',
-                name: 'Fabric Spinner',
-                input: { fabric: 3 },
-                output: { insulation: 2 },
-                powerCost: 5,
+                id: 'fabric-to-dust-trap',
+                name: 'Electrostatic Dust Trap Maker',
+                input: { fabric: 1 },
+                output: { dustTraps: 1 },
+                powerCost: 2,
                 waterCost: 0,
-                description: 'Spin fabrics into thermal insulation'
+                description: 'Transform woolen cloth into electrostatic dust trap wipes',
+                process: 'Embed copper/aluminum filaments and charge with static current',
+                benefit: 'Active dust-attracting cleaning cloth for Mars environment',
+                status: 'available', // available, recycled
+                producesCount: 0 // Track how many times this system has been used
             },
             {
-                id: 'fabric-to-wipes',
-                name: 'Fabric Weaver',
-                input: { fabric: 2 },
-                output: { wipes: 4 },
+                id: 'old-cloth-to-birthday-decoration',
+                name: 'Birthday Decoration Maker',
+                input: { fabric: 1 },
+                output: { birthdayDecorations: 1 },
+                powerCost: 1,
+                waterCost: 0,
+                description: 'Transform old cloth into festive birthday decorations',
+                process: 'Cut, dye, and shape old cloth into colorful party decorations',
+                benefit: 'Boost crew morale with celebratory decorations for special occasions',
+                status: 'available',
+                producesCount: 0
+            },
+            {
+                id: 'packaging-to-party-containers',
+                name: 'Party Container Fabricator',
+                input: { packaging: 2 },
+                output: { partyContainers: 3 },
                 powerCost: 3,
                 waterCost: 1,
-                description: 'Weave fabrics into cleaning wipes'
+                description: 'Transform old packaging into food containers for birthday celebrations',
+                process: 'Wash → Shred → Melt → Extrude packaging materials into festive food containers',
+                benefit: 'Create colorful party food containers to enhance crew birthday celebrations and boost morale',
+                status: 'available',
+                producesCount: 0
             },
             {
-                id: 'packaging-to-panels',
-                name: 'Thermal Melter',
-                input: { packaging: 4 },
-                output: { panels: 2 },
-                powerCost: 8,
+                id: 'foam-to-party-balloons',
+                name: 'Party Balloon Maker',
+                input: { foam: 2 },
+                output: { partyBalloons: 4 },
+                powerCost: 2,
                 waterCost: 0,
-                description: 'Melt packaging into structural panels'
+                description: 'Transform foam into festive party balloons for birthday celebrations',
+                process: 'Shape → Heat → Inflate foam materials into colorful party balloons',
+                benefit: 'Create cheerful balloons to enhance birthday party atmosphere and crew morale',
+                status: 'available',
+                producesCount: 0
             },
-            {
-                id: 'packaging-to-containers',
-                name: 'Mold Former',
-                input: { packaging: 3 },
-                output: { containers: 3 },
-                powerCost: 6,
-                waterCost: 0,
-                description: 'Form packaging into storage containers'
-            },
+
+
+
+
             {
                 id: 'eva-to-composites',
                 name: 'Composite Processor',
@@ -77,7 +105,9 @@ class MarsRecyclingGame {
                 output: { composites: 1 },
                 powerCost: 10,
                 waterCost: 2,
-                description: 'Convert EVA waste into structural composites'
+                description: 'Convert EVA waste into structural composites',
+                status: 'available',
+                producesCount: 0
             },
             {
                 id: 'foam-to-cushioning',
@@ -86,8 +116,38 @@ class MarsRecyclingGame {
                 output: { cushioning: 4 },
                 powerCost: 4,
                 waterCost: 0,
-                description: 'Reprocess foam into tool cushioning'
-            }
+                description: 'Reprocess foam into tool cushioning',
+                status: 'available',
+                producesCount: 0
+            },
+            {
+                id: 'eva-to-air-filter',
+                name: 'Atmospheric Purification System',
+                input: { eva: 2 },
+                output: { airFilters: 1 },
+                powerCost: 6,
+                waterCost: 1,
+                description: 'Transform EVA suit materials into advanced air filtration units',
+                process: 'Extract micro-fiber layers and integrate with activated carbon compounds',
+                benefit: 'Critical air purification for maintaining breathable atmosphere in habitat',
+                status: 'available',
+                producesCount: 0
+            },
+
+            {
+                id: 'foam-to-water-recycler',
+                name: 'Hydration Recovery Unit',
+                input: { foam: 2, fabric: 1 },
+                output: { waterRecyclers: 1 },
+                powerCost: 5,
+                waterCost: 0,
+                description: 'Combine foam and fabric into water reclamation systems',
+                process: 'Create multi-layer filtration using foam absorption and fabric membrane technology',
+                benefit: 'Essential water recovery from atmospheric moisture and waste processing',
+                status: 'available',
+                producesCount: 0
+            },
+
         ];
 
         // Crew members data
@@ -149,6 +209,12 @@ class MarsRecyclingGame {
         this.currentInteriorIndex = 0;
         this.interiorAreas = [];
 
+        // Initialize party system
+        this.partyTriggered = false;
+
+        // Rendering optimization
+        this.needsRedraw = true;
+
         this.initializeStoryDialogs();
         this.init();
     }
@@ -156,6 +222,7 @@ class MarsRecyclingGame {
     init() {
 
         this.updateUI();
+        this.needsRedraw = true;
         this.renderHabitat();
 
         // Add canvas click listener for module selection
@@ -284,14 +351,20 @@ class MarsRecyclingGame {
         wasteTypes.forEach(type => {
             this.waste[type] += Math.floor(Math.random() * 2) + 1;
         });
-        this.showNotification('Daily waste generated from crew activities');
+        
+        // Don't show notifications when in interior view
+        if (this.currentView !== 'interior') {
+            this.showNotification('Daily waste generated from crew activities');
+        }
+        
         this.updateUI();
     }
 
     advanceDay() {
         this.sol++;
-        this.power = Math.max(50, this.power - Math.floor(Math.random() * 5));
-        this.water = Math.max(30, this.water - Math.floor(Math.random() * 3));
+        // Keep power and water always sufficient
+        this.power = Math.max(95, this.power);
+        this.water = Math.max(90, this.water);
         this.updateUI();
     }
 
@@ -300,8 +373,7 @@ class MarsRecyclingGame {
         for (let [resource, amount] of Object.entries(system.input)) {
             if (this.waste[resource] < amount) return false;
         }
-        if (this.power < system.powerCost) return false;
-        if (this.water < system.waterCost) return false;
+        // Power and water are always sufficient
         return true;
     }
 
@@ -309,17 +381,26 @@ class MarsRecyclingGame {
         const system = this.recyclingSystems.find(s => s.id === systemId);
         if (!system || !this.canRecycle(system)) return;
 
+        console.log('Recycling system:', systemId, 'Output:', system.output);
+
         // Consume inputs
         for (let [resource, amount] of Object.entries(system.input)) {
             this.waste[resource] -= amount;
         }
-        this.power -= system.powerCost;
-        this.water -= system.waterCost;
+        // Power and water are always sufficient, no need to consume them
 
         // Generate outputs
         for (let [product, amount] of Object.entries(system.output)) {
+            if (!this.products[product]) {
+                this.products[product] = 0;
+            }
             this.products[product] += amount;
+            console.log('Added product:', product, 'amount:', amount, 'total now:', this.products[product]);
         }
+
+        // Set status to recycled and increment produces count
+        system.status = 'recycled';
+        system.producesCount += Object.values(system.output).reduce((sum, amount) => sum + amount, 0);
 
         // Enhanced feedback with processing details
         const outputText = Object.entries(system.output)
@@ -335,8 +416,347 @@ class MarsRecyclingGame {
         // Check for mission completion
         this.checkMissionCompletion();
 
+        // Check for birthday party readiness
+        this.checkBirthdayPartyReadiness();
+
         this.updateUI();
         this.generateRecyclingOptions();
+        this.updatePartyProgress();
+    }
+
+    checkBirthdayPartyReadiness() {
+        // Check if we have at least 1 of each birthday item
+        const birthdayItems = {
+            birthdayDecorations: this.products.birthdayDecorations || 0,
+            partyContainers: this.products.partyContainers || 0,
+            partyBalloons: this.products.partyBalloons || 0
+        };
+
+        // Debug logging
+        console.log('Birthday items check:', birthdayItems);
+        console.log('Party triggered status:', this.partyTriggered);
+
+        const hasAllItems = Object.values(birthdayItems).every(count => count > 0);
+        console.log('Has all items:', hasAllItems);
+        
+        if (hasAllItems && !this.partyTriggered) {
+            console.log('Triggering birthday party!');
+            this.partyTriggered = true; // Prevent multiple triggers
+            this.showBirthdayPartyDialog(birthdayItems);
+        }
+    }
+
+    showBirthdayPartyDialog(birthdayItems) {
+        // Select a random crew member for the birthday
+        const crewMember = this.crewMembers[Math.floor(Math.random() * this.crewMembers.length)];
+        
+        // Calculate total items
+        const totalItems = Object.values(birthdayItems).reduce((sum, count) => sum + count, 0);
+
+        // Create party dialog overlay
+        const overlay = document.createElement('div');
+        overlay.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        `;
+
+        overlay.innerHTML = `
+            <div style="
+                background: linear-gradient(135deg, #FF69B4, #FFB6C1, #FF1493);
+                border: 3px solid #FFD700;
+                border-radius: 20px;
+                padding: 40px;
+                max-width: 500px;
+                text-align: center;
+                box-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
+                animation: partyGlow 2s ease-in-out infinite alternate;
+            ">
+                <h2 style="color: white; margin-bottom: 20px; font-size: 28px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">
+                    🎉 Congratulations! Ready to party! 🎉
+                </h2>
+                <p style="color: white; font-size: 18px; margin-bottom: 15px; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">
+                    Celebrating <strong>${crewMember.name}'s</strong> birthday!
+                </p>
+                <div style="
+                    background: rgba(255, 255, 255, 0.2);
+                    border-radius: 10px;
+                    padding: 20px;
+                    margin: 20px 0;
+                    border: 2px solid rgba(255, 255, 255, 0.3);
+                ">
+                    <h3 style="color: white; margin-bottom: 15px;">Party Items Ready:</h3>
+                    <div style="display: flex; justify-content: space-around; margin-bottom: 15px;">
+                        <div style="text-align: center;">
+                            <div style="font-size: 24px;">🎉</div>
+                            <div style="color: white; font-size: 14px;">${birthdayItems.birthdayDecorations} Decorations</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="font-size: 24px;">🥡</div>
+                            <div style="color: white; font-size: 14px;">${birthdayItems.partyContainers} Containers</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="font-size: 24px;">🎈</div>
+                            <div style="color: white; font-size: 14px;">${birthdayItems.partyBalloons} Balloons</div>
+                        </div>
+                    </div>
+                    <p style="color: white; font-weight: bold;">Total Items: ${totalItems}</p>
+                </div>
+                <button onclick="game.startBirthdayParty('${crewMember.name}')" style="
+                    background: linear-gradient(135deg, #FFD700, #FFA500);
+                    color: #8B4513;
+                    border: none;
+                    padding: 15px 30px;
+                    border-radius: 25px;
+                    font-size: 18px;
+                    font-weight: bold;
+                    cursor: pointer;
+                    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+                    transition: all 0.3s ease;
+                    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+                " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                    🎊 Let's Party! 🎊
+                </button>
+            </div>
+        `;
+
+        // Add CSS animation for the glow effect
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes partyGlow {
+                0% { box-shadow: 0 0 30px rgba(255, 215, 0, 0.8); }
+                100% { box-shadow: 0 0 50px rgba(255, 105, 180, 0.8), 0 0 70px rgba(255, 215, 0, 0.6); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        document.body.appendChild(overlay);
+
+        // Store overlay reference for cleanup
+        this.partyOverlay = overlay;
+    }
+
+    startBirthdayParty(crewMemberName) {
+        // Remove the party dialog
+        if (this.partyOverlay) {
+            this.partyOverlay.remove();
+            this.partyOverlay = null;
+        }
+
+        // Create video overlay
+        const videoOverlay = document.createElement('div');
+        videoOverlay.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10001;
+        `;
+
+        videoOverlay.innerHTML = `
+            <div style="text-align: center;">
+                <h2 style="color: #FFD700; margin-bottom: 20px; font-size: 24px;">
+                    🎉 ${crewMemberName}'s Birthday Party! 🎉
+                </h2>
+                <video id="partyVideo" width="800" height="450" controls muted style="border-radius: 10px; box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);">
+                    <source src="party.mp4" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+                <br>
+                <div style="margin-top: 15px;">
+                    <button id="playButton" onclick="game.playPartyVideo()" style="
+                        background: linear-gradient(135deg, #32CD32, #228B22);
+                        color: white;
+                        border: none;
+                        padding: 10px 20px;
+                        border-radius: 15px;
+                        font-size: 16px;
+                        font-weight: bold;
+                        cursor: pointer;
+                        margin-right: 10px;
+                        box-shadow: 0 4px 15px rgba(50, 205, 50, 0.4);
+                    ">
+                        ▶️ Play Video
+                    </button>
+                    <button onclick="game.closeBirthdayParty()" style="
+                        background: linear-gradient(135deg, #FF69B4, #FF1493);
+                        color: white;
+                        border: none;
+                        padding: 10px 20px;
+                        border-radius: 15px;
+                        font-size: 16px;
+                        font-weight: bold;
+                        cursor: pointer;
+                        box-shadow: 0 4px 15px rgba(255, 105, 180, 0.4);
+                    ">
+                        Close Party 🎊
+                    </button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(videoOverlay);
+        this.videoOverlay = videoOverlay;
+
+        // Try to autoplay the video after a short delay
+        setTimeout(() => {
+            this.playPartyVideo();
+        }, 500);
+    }
+
+    playPartyVideo() {
+        const video = document.getElementById('partyVideo');
+        const playButton = document.getElementById('playButton');
+        
+        if (video) {
+            video.play().then(() => {
+                // Video started playing successfully
+                if (playButton) {
+                    playButton.style.display = 'none';
+                }
+            }).catch((error) => {
+                // Autoplay failed, show play button
+                console.log('Autoplay failed:', error);
+                if (playButton) {
+                    playButton.style.display = 'inline-block';
+                    playButton.textContent = '▶️ Click to Play Video';
+                }
+            });
+        }
+    }
+
+    closeBirthdayParty() {
+        if (this.videoOverlay) {
+            this.videoOverlay.remove();
+            this.videoOverlay = null;
+        }
+        
+        // Reset party trigger so it can happen again
+        this.partyTriggered = false;
+    }
+
+    // Test function to manually trigger party (for debugging)
+    testParty() {
+        console.log('Testing party system...');
+        this.products.birthdayDecorations = 1;
+        this.products.partyContainers = 1;
+        this.products.partyBalloons = 1;
+        this.partyTriggered = false;
+        this.checkBirthdayPartyReadiness();
+    }
+
+    // Test function to add some party items for progress testing
+    testPartyProgress() {
+        console.log('Testing party progress...');
+        this.products.birthdayDecorations = 1;
+        this.products.partyContainers = 0;
+        this.products.partyBalloons = 0;
+        this.updatePartyProgress();
+        this.updateUI();
+        this.showNotification('🎉 Added 1 Birthday Decoration for testing!');
+    }
+
+    updatePartyProgress() {
+        // Get current party item counts
+        const birthdayItems = {
+            birthdayDecorations: this.products.birthdayDecorations || 0,
+            partyContainers: this.products.partyContainers || 0,
+            partyBalloons: this.products.partyBalloons || 0
+        };
+
+        // Update individual item displays
+        const decorationsCount = document.getElementById('party-decorations-count');
+        const containersCount = document.getElementById('party-containers-count');
+        const balloonsCount = document.getElementById('party-balloons-count');
+
+        const decorationsStatus = document.getElementById('party-decorations-status');
+        const containersStatus = document.getElementById('party-containers-status');
+        const balloonsStatus = document.getElementById('party-balloons-status');
+
+        if (decorationsCount) decorationsCount.textContent = birthdayItems.birthdayDecorations;
+        if (containersCount) containersCount.textContent = birthdayItems.partyContainers;
+        if (balloonsCount) balloonsCount.textContent = birthdayItems.partyBalloons;
+
+        // Update status indicators
+        if (decorationsStatus) {
+            if (birthdayItems.birthdayDecorations > 0) {
+                decorationsStatus.textContent = '✅ Ready';
+                decorationsStatus.className = 'party-status ready';
+            } else {
+                decorationsStatus.textContent = '❌ Not Ready';
+                decorationsStatus.className = 'party-status not-ready';
+            }
+        }
+
+        if (containersStatus) {
+            if (birthdayItems.partyContainers > 0) {
+                containersStatus.textContent = '✅ Ready';
+                containersStatus.className = 'party-status ready';
+            } else {
+                containersStatus.textContent = '❌ Not Ready';
+                containersStatus.className = 'party-status not-ready';
+            }
+        }
+
+        if (balloonsStatus) {
+            if (birthdayItems.partyBalloons > 0) {
+                balloonsStatus.textContent = '✅ Ready';
+                balloonsStatus.className = 'party-status ready';
+            } else {
+                balloonsStatus.textContent = '❌ Not Ready';
+                balloonsStatus.className = 'party-status not-ready';
+            }
+        }
+
+        // Update overall progress
+        const readyItems = Object.values(birthdayItems).filter(count => count > 0).length;
+        const totalItems = 3;
+        const progressPercent = (readyItems / totalItems) * 100;
+
+        const progressFill = document.getElementById('party-progress-fill');
+        const progressText = document.getElementById('party-progress-text');
+        const overallMessage = document.getElementById('party-overall-message');
+        const overallStatus = document.getElementById('party-overall-status');
+
+        if (progressFill) progressFill.style.width = progressPercent + '%';
+        if (progressText) progressText.textContent = `${readyItems}/${totalItems} Items Ready`;
+
+        if (overallMessage && overallStatus) {
+            if (readyItems === totalItems) {
+                overallMessage.textContent = '🎉 All items ready! Party time! 🎉';
+                overallStatus.classList.add('ready');
+            } else {
+                const needed = [];
+                if (birthdayItems.birthdayDecorations === 0) needed.push('Decorations');
+                if (birthdayItems.partyContainers === 0) needed.push('Containers');
+                if (birthdayItems.partyBalloons === 0) needed.push('Balloons');
+                
+                overallMessage.textContent = `Still need: ${needed.join(', ')}`;
+                overallStatus.classList.remove('ready');
+            }
+        }
+    }
+
+    getWasteIcon(wasteType) {
+        const icons = {
+            fabric: '🧶',
+            packaging: '📦',
+            eva: '🚀',
+            foam: '🧽'
+        };
+        return icons[wasteType] || '🗑️';
     }
 
     triggerProcessingEffect() {
@@ -364,18 +784,29 @@ class MarsRecyclingGame {
                 .map(([resource, amount]) => `${amount} ${resource}`)
                 .join(', ');
             const outputText = Object.entries(system.output)
-                .map(([product, amount]) => `${amount} ${product}`)
+                .map(([product, amount]) => `${system.producesCount} ${product}`)
                 .join(', ');
+
+            let buttonContent;
+            let buttonClass = '';
+
+            if (system.status === 'recycled') {
+                buttonContent = 'Recycled';
+                buttonClass = 'recycled-button';
+            } else {
+                buttonContent = 'Not Recycled';
+                buttonClass = 'not-recycled-button';
+            }
 
             div.innerHTML = `
                 <h4>${system.name}</h4>
                 <div class="requirements">
                     Needs: ${inputText}<br>
-                    Power: ${system.powerCost}% | Water: ${system.waterCost}L<br>
+                    Power: 100% | Water: 100L<br>
                     Produces: ${outputText}
                 </div>
-                <button onclick="game.recycle('${system.id}')" ${!canUse ? 'disabled' : ''}>
-                    ${canUse ? 'Recycle' : 'Insufficient Resources'}
+                <button onclick="game.recycle('${system.id}')" class="${buttonClass}">
+                    ${buttonContent}
                 </button>
             `;
 
@@ -391,12 +822,12 @@ class MarsRecyclingGame {
         // Update power with warning colors
         const powerElement = document.getElementById('power-level');
         powerElement.textContent = this.power;
-        powerElement.className = this.power < 30 ? 'low-power' : '';
+        powerElement.className = this.power < 10 ? 'low-power' : '';
 
         // Update water with warning colors
         const waterElement = document.getElementById('water-level');
         waterElement.textContent = this.water;
-        waterElement.className = this.water < 40 ? 'low-water' : '';
+        waterElement.className = this.water < 10 ? 'low-water' : '';
 
         // Update waste inventory
         Object.keys(this.waste).forEach(type => {
@@ -424,6 +855,9 @@ class MarsRecyclingGame {
 
         // Update crew portraits
         this.updateCrewPortraits();
+
+        // Update party progress
+        this.updatePartyProgress();
     }
 
     getProductIcon(product) {
@@ -434,33 +868,56 @@ class MarsRecyclingGame {
             containers: '📦',
             composites: '🔧',
             tools: '🛠️',
-            cushioning: '🛡️'
+            cushioning: '🛡️',
+            dustTraps: '🧲',
+            airFilters: '🌬️',
+            solarCells: '☀️',
+            waterRecyclers: '💧',
+            communicationDevices: '📡',
+            birthdayDecorations: '🎉',
+            partyContainers: '🥡',
+            partyBalloons: '🎈'
         };
         return icons[product] || '📦';
     }
 
     checkResourceWarnings() {
-        if (this.power < 20) {
+        // Don't show notifications when in interior view
+        if (this.currentView === 'interior') {
+            return;
+        }
+
+        // Power and water are always sufficient, no warnings needed
+        if (this.power < 10) {
             this.showNotification('⚠️ CRITICAL: Power levels dangerously low!');
-        } else if (this.power < 40) {
+        } else if (this.power < 20) {
             this.showNotification('⚡ Warning: Power running low');
         }
 
-        if (this.water < 30) {
+        if (this.water < 10) {
             this.showNotification('⚠️ CRITICAL: Water reserves critically low!');
-        } else if (this.water < 50) {
+        } else if (this.water < 20) {
             this.showNotification('💧 Warning: Water levels decreasing');
         }
     }
 
     renderHabitat() {
+        // Only render if needed
+        if (!this.needsRedraw) return;
+
+        // Check if we're in product rack view
+        if (this.currentView === 'product-rack') {
+            this.renderProductRack();
+            this.needsRedraw = false;
+            return;
+        }
+
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
         // Check if we're in interior view
-        console.log('renderHabitat - currentView:', this.currentView, 'selectedModule:', this.selectedModule);
         if (this.currentView === 'interior' && this.selectedModule) {
-            console.log('Rendering interior view');
             this.renderModuleInterior(this.selectedModule);
+            this.needsRedraw = false;
             return;
         }
 
@@ -511,6 +968,9 @@ class MarsRecyclingGame {
 
         // Draw dim Mars sun
         this.drawMartianSun();
+
+        // Mark as rendered
+        this.needsRedraw = false;
     }
 
     drawMartianLandscape() {
@@ -864,11 +1324,11 @@ class MarsRecyclingGame {
             const y = 300 + Math.sin(angle) * 350;
 
             if (y <= 300) { // Only draw on upper dome
-                this.ctx.fillStyle = `rgba(0, 255, 255, ${0.1 + Math.sin(time + i) * 0.1})`;
-                this.ctx.shadowColor = '#00FFFF';
-                this.ctx.shadowBlur = 10;
+                this.ctx.fillStyle = `rgba(255, 255, 0, ${0.5 + Math.sin(time + i) * 0.3})`;
+                this.ctx.shadowColor = '#FFFF00';
+                this.ctx.shadowBlur = 20;
                 this.ctx.beginPath();
-                this.ctx.arc(x, y, 3, 0, Math.PI * 2);
+                this.ctx.arc(x, y, 1.5, 0, Math.PI * 2);
                 this.ctx.fill();
                 this.ctx.shadowBlur = 0;
             }
@@ -944,15 +1404,8 @@ class MarsRecyclingGame {
     }
 
     showNotification(message) {
-        const notification = document.createElement('div');
-        notification.className = 'notification';
-        notification.textContent = message;
-
-        document.getElementById('notifications').appendChild(notification);
-
-        setTimeout(() => {
-            notification.remove();
-        }, 3000);
+        // All notifications disabled
+        return;
     }
 
     // Story dialog system
@@ -1072,6 +1525,16 @@ class MarsRecyclingGame {
         }
     }
 
+    // Method to reset recycling systems for testing
+    resetRecyclingSystems() {
+        this.recyclingSystems.forEach(system => {
+            system.status = 'available';
+            system.producesCount = 0;
+        });
+        this.generateRecyclingOptions();
+        this.showNotification('🔄 Recycling systems reset!');
+    }
+
     handleLivingQuartersClick() {
         console.log('Living Quarters button clicked!');
 
@@ -1187,6 +1650,17 @@ class MarsRecyclingGame {
         this.showNotification('🏠 Returned to Mars habitat overview');
     }
 
+    toggleLivingQuartersView() {
+        const controlPanel = document.getElementById('control-panel');
+        const panelContent = document.getElementById('panel-content');
+
+        if (controlPanel && panelContent) {
+            // Hide the panel content when in living quarters view
+            panelContent.style.display = 'none';
+            controlPanel.classList.add('living-quarters-mode');
+        }
+    }
+
     toggleCanvasBackground() {
         // Default to living.png for backward compatibility
         this.toggleCanvasBackgroundWithImage('living.png');
@@ -1267,6 +1741,7 @@ class MarsRecyclingGame {
         this.currentView = 'interior';
         this.selectedModule = this.modules.find(m => m.type === moduleType);
         this.currentInteriorIndex = 0;
+        this.needsRedraw = true;
 
         console.log('Current view set to:', this.currentView);
         console.log('Selected module:', this.selectedModule);
@@ -1319,6 +1794,7 @@ class MarsRecyclingGame {
         this.currentView = 'habitat';
         this.selectedModule = null;
         this.currentInteriorIndex = 0;
+        this.needsRedraw = true;
 
         // Hide navigation buttons
         const navButtons = document.getElementById('canvas-navigation');
@@ -1519,7 +1995,95 @@ class MarsRecyclingGame {
                     setTimeout(() => {
                         this.showRecyclingDialogueStep();
                     }, 300);
+                } else {
+                    // All recycling dialogues completed - show start game button
+                    setTimeout(() => {
+                        this.showStartGameButton();
+                    }, 500);
                 }
+            });
+        }
+    }
+
+    // Show Start Game Button after all dialogues complete
+    showStartGameButton() {
+        const startGameElement = document.createElement('div');
+        startGameElement.className = 'start-game-overlay';
+
+        startGameElement.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            backdrop-filter: blur(5px);
+        `;
+
+        startGameElement.innerHTML = `
+            <div style="
+                background: linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(20, 20, 40, 0.95) 100%);
+                border: 3px solid rgba(0, 150, 255, 0.5);
+                border-radius: 20px;
+                padding: 40px;
+                text-align: center;
+                box-shadow: 0 0 30px rgba(0, 150, 255, 0.3);
+                backdrop-filter: blur(10px);
+                max-width: 400px;
+            ">
+                <div style="
+                    font-size: 24px;
+                    color: #00BFFF;
+                    margin-bottom: 20px;
+                    font-family: 'Courier New', monospace;
+                    text-transform: uppercase;
+                    letter-spacing: 2px;
+                ">🚀 Mission Ready</div>
+                
+                <div style="
+                    color: #fff;
+                    margin-bottom: 30px;
+                    font-size: 16px;
+                    line-height: 1.5;
+                ">
+                    All systems initialized.<br>
+                    Ready to begin Mars recycling operations.
+                </div>
+                
+                <button id="start-game-btn" style="
+                    background: linear-gradient(135deg, #FF6B35 0%, #E55A2B 100%);
+                    color: white;
+                    border: none;
+                    padding: 15px 40px;
+                    border-radius: 10px;
+                    font-size: 18px;
+                    font-weight: bold;
+                    cursor: pointer;
+                    text-transform: uppercase;
+                    letter-spacing: 1px;
+                    box-shadow: 0 4px 15px rgba(255, 107, 53, 0.4);
+                    transition: all 0.3s ease;
+                    font-family: 'Courier New', monospace;
+                " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(255, 107, 53, 0.6)';" 
+                   onmouseout="this.style.transform='translateY(0px)'; this.style.boxShadow='0 4px 15px rgba(255, 107, 53, 0.4)';">
+                    Start Game
+                </button>
+            </div>
+        `;
+
+        document.body.appendChild(startGameElement);
+
+        // Add click handler for the start game button
+        const startBtn = document.getElementById('start-game-btn');
+        if (startBtn) {
+            startBtn.addEventListener('click', () => {
+                startGameElement.remove();
+                this.startRecyclingMiniGame();
+                this.showNotification('🎮 Game Started! Begin your Mars recycling mission!');
             });
         }
     }
@@ -1768,6 +2332,11 @@ class MarsRecyclingGame {
 
     // Add crew narrative system
     addCrewNarrative() {
+        // Don't show notifications when in interior view
+        if (this.currentView === 'interior') {
+            return;
+        }
+
         const narratives = [
             "Commander Chen: 'The recycling bay is running efficiently. Great work!'",
             "Dr. Rodriguez: 'We could use more insulation in the greenhouse module.'",
@@ -1786,32 +2355,241 @@ class MarsRecyclingGame {
     }
 
     showNarrative(message) {
-        const notification = document.createElement('div');
-        notification.className = 'notification narrative';
-        notification.innerHTML = `<strong>📡</strong> ${message}`;
-
-        document.getElementById('notifications').appendChild(notification);
-
-        setTimeout(() => {
-            notification.remove();
-        }, 5000);
+        // All notifications disabled
+        return;
     }
 
     // Enhanced animation loop
     startAnimationLoop() {
-        const animate = () => {
-            // Only render habitat if canvas background is not hidden (living quarters mode)
-            if (!this.canvasBackgroundHidden) {
-                this.renderHabitat();
+        let lastRenderTime = 0;
+        const targetFPS = 30; // Limit to 30 FPS to reduce excessive rendering
+        const frameInterval = 1000 / targetFPS;
+
+        const animate = (currentTime) => {
+            if (currentTime - lastRenderTime >= frameInterval) {
+                // Force redraw periodically to keep atmospheric particles moving
+                // This ensures dust particles continue during dialogs
+                this.needsRedraw = true;
+
+                // Only render habitat if canvas background is not hidden (living quarters mode)
+                if (!this.canvasBackgroundHidden) {
+                    this.renderHabitat();
+                }
+                lastRenderTime = currentTime;
             }
             requestAnimationFrame(animate);
         };
         animate();
     }
 
-    // Crew management methods
+    // Recycling Mini-Game Implementation
+    startRecyclingMiniGame() {
+        this.miniGameState = {
+            active: true,
+            score: 0,
+            combinations: [],
+            selectedItems: [],
+            availableWaste: ['fabric', 'packaging', 'eva', 'foam'],
+            recipes: []
+        };
+
+        // Switch to product rack view
+        this.currentView = 'product-rack';
+        this.needsRedraw = true;
+
+        // Initialize recyclable items with icons and descriptions
+        this.recyclableItems = [
+            {
+                id: 'fabric',
+                name: 'Fabric Waste',
+                icon: '🧵',
+                description: 'Used clothing and textiles',
+                count: this.waste.fabric || 0,
+                color: '#FF6B35'
+            },
+            {
+                id: 'packaging',
+                name: 'Packaging',
+                icon: '📦',
+                description: 'Food containers and wrapping',
+                count: this.waste.packaging || 0,
+                color: '#00BFFF'
+            },
+            {
+                id: 'eva',
+                name: 'EVA Waste',
+                icon: '🚀',
+                description: 'Spacesuit and equipment waste',
+                count: this.waste.eva || 0,
+                color: '#FFD700'
+            },
+            {
+                id: 'foam',
+                name: 'Foam Materials',
+                icon: '🧽',
+                description: 'Insulation and padding foam',
+                count: this.waste.foam || 0,
+                color: '#50E3C2'
+            }
+        ];
+
+        // Render the product rack
+        this.renderProductRack();
+
+        // Show mini-game notification
+        this.showNotification('🎮 Recycling Station Active! Select items to recycle.');
+    }
+
+    renderProductRack() {
+        // Clear the canvas
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+        // Use the same background as recycling bay (mars1.png)
+        this.drawRecyclingBayBackground();
+    }
+
+    drawRecyclingBayBackground() {
+        // Load and draw the mars1.png background image (same as recycling bay)
+        const backgroundImage = new Image();
+        backgroundImage.onload = () => {
+            // Draw the image to fill the entire canvas
+            this.ctx.drawImage(backgroundImage, 0, 0, this.canvas.width, this.canvas.height);
+
+            // After background is loaded, draw the UI elements on top
+            this.drawProductRackUI();
+        };
+        backgroundImage.onerror = () => {
+            console.log('mars1.png not found, using fallback background');
+            // Fallback to a simple Mars-like gradient
+            const gradient = this.ctx.createLinearGradient(0, 0, 0, this.canvas.height);
+            gradient.addColorStop(0, '#D2691E');
+            gradient.addColorStop(1, '#8B4513');
+            this.ctx.fillStyle = gradient;
+            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+            // Draw the UI elements on top
+            this.drawProductRackUI();
+        };
+        backgroundImage.src = 'mars1.png';
+    }
+
+    drawProductRackUI() {
+        // Draw product rack title
+        this.ctx.fillStyle = '#FFFFFF';
+        this.ctx.font = 'bold 24px "Courier New", monospace';
+        this.ctx.textAlign = 'center';
+        this.ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+        this.ctx.shadowBlur = 5;
+        this.ctx.fillText('🔄 RECYCLING STATION', this.canvas.width / 2, 40);
+        this.ctx.shadowBlur = 0;
+
+        // Draw subtitle
+        this.ctx.fillStyle = '#00BFFF';
+        this.ctx.font = '14px "Courier New", monospace';
+        this.ctx.fillText('Select items to process for recycling', this.canvas.width / 2, 65);
+
+        // Calculate grid layout (2x2 grid)
+        const gridCols = 2;
+        const gridRows = 2;
+        const itemWidth = 200;
+        const itemHeight = 150;
+        const spacing = 40;
+        const startX = (this.canvas.width - (gridCols * itemWidth + (gridCols - 1) * spacing)) / 2;
+        const startY = 100;
+
+        // Draw product rack items
+        this.recyclableItems.forEach((item, index) => {
+            const col = index % gridCols;
+            const row = Math.floor(index / gridCols);
+            const x = startX + col * (itemWidth + spacing);
+            const y = startY + row * (itemHeight + spacing);
+
+            this.drawProductRackItem(item, x, y, itemWidth, itemHeight);
+        });
+
+        // Draw back button
+        this.drawBackToHabitatButton();
+    }
+
+    drawProductRackItem(item, x, y, width, height) {
+        // Draw item container with futuristic styling
+        const gradient = this.ctx.createLinearGradient(x, y, x + width, y + height);
+        gradient.addColorStop(0, 'rgba(0, 0, 0, 0.8)');
+        gradient.addColorStop(0.5, 'rgba(20, 20, 40, 0.9)');
+        gradient.addColorStop(1, 'rgba(0, 0, 0, 0.8)');
+
+        this.ctx.fillStyle = gradient;
+        this.ctx.fillRect(x, y, width, height);
+
+        // Draw border with item color
+        this.ctx.strokeStyle = item.color;
+        this.ctx.lineWidth = 3;
+        this.ctx.shadowColor = item.color;
+        this.ctx.shadowBlur = 10;
+        this.ctx.strokeRect(x, y, width, height);
+        this.ctx.shadowBlur = 0;
+
+        // Draw item icon (large)
+        this.ctx.font = '48px Arial';
+        this.ctx.textAlign = 'center';
+        this.ctx.fillStyle = item.color;
+        this.ctx.fillText(item.icon, x + width / 2, y + 60);
+
+        // Draw item name
+        this.ctx.font = 'bold 16px "Courier New", monospace';
+        this.ctx.fillStyle = '#FFFFFF';
+        this.ctx.fillText(item.name, x + width / 2, y + 85);
+
+        // Draw item description
+        this.ctx.font = '12px "Courier New", monospace';
+        this.ctx.fillStyle = '#CCCCCC';
+        this.ctx.fillText(item.description, x + width / 2, y + 105);
+
+
+
+        // Draw selection indicator if clickable
+        if (item.count > 0) {
+            this.ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+            this.ctx.fillRect(x + 5, y + height - 25, width - 10, 20);
+
+            this.ctx.fillStyle = '#00FF00';
+            this.ctx.font = '12px "Courier New", monospace';
+            this.ctx.fillText('CLICK TO SELECT', x + width / 2, y + height - 10);
+        }
+
+        // Store item bounds for click detection
+        item.bounds = { x, y, width, height };
+    }
+
+    drawBackToHabitatButton() {
+        const buttonWidth = 120;
+        const buttonHeight = 40;
+        const buttonX = 20;
+        const buttonY = this.canvas.height - 60;
+
+        // Button background
+        this.ctx.fillStyle = 'rgba(255, 107, 53, 0.9)';
+        this.ctx.fillRect(buttonX, buttonY, buttonWidth, buttonHeight);
+
+        // Button border
+        this.ctx.strokeStyle = '#FF6B35';
+        this.ctx.lineWidth = 2;
+        this.ctx.strokeRect(buttonX, buttonY, buttonWidth, buttonHeight);
+
+        // Button text
+        this.ctx.fillStyle = '#FFFFFF';
+        this.ctx.font = 'bold 14px "Courier New", monospace';
+        this.ctx.textAlign = 'center';
+        this.ctx.fillText('← BACK', buttonX + buttonWidth / 2, buttonY + 25);
+
+        // Store button bounds for click detection
+        this.backButtonBounds = { x: buttonX, y: buttonY, width: buttonWidth, height: buttonHeight };
+    }
+
     generateCrewPortraits() {
         const container = document.getElementById('crew-portraits');
+        if (!container) return;
+
         container.innerHTML = '';
 
         this.crewMembers.forEach(member => {
@@ -1820,10 +2598,12 @@ class MarsRecyclingGame {
             div.id = `crew-${member.id}`;
 
             div.innerHTML = `
-                <div class="crew-portrait">${member.emoji}</div>
-                <div class="crew-name">${member.name}</div>
-                <div class="crew-role">${member.role}</div>
-                <div class="crew-status" id="status-${member.id}">${member.status}</div>
+                <div class="crew-avatar">${member.emoji}</div>
+                <div class="crew-info">
+                    <div class="crew-name">${member.name}</div>
+                    <div class="crew-role">${member.role}</div>
+                    <div class="crew-status" id="status-${member.id}">${member.activity}</div>
+                </div>
             `;
 
             container.appendChild(div);
@@ -2035,10 +2815,7 @@ class MarsRecyclingGame {
     switchPanel(panelId) {
         const controlPanel = document.getElementById('control-panel');
 
-        // If sidebar is collapsed, expand it when switching panels
-        if (controlPanel.classList.contains('collapsed')) {
-            controlPanel.classList.remove('collapsed');
-        }
+        // Sidebar will only open/close via hamburger menu, not when switching panels
 
         // Remove active class from all nav items and panels
         document.querySelectorAll('.nav-item').forEach(item => {
@@ -2062,6 +2839,7 @@ class MarsRecyclingGame {
                 'waste-inventory': 'Waste Inventory',
                 'recycling-options': 'Recycling Systems',
                 'products-inventory': 'Products',
+                'party-progress': 'Party Progress',
                 'background-controls': 'Background Settings',
                 'living-quarters': 'Living Quarters',
                 'research-lab': 'Research Lab',
@@ -2087,6 +2865,19 @@ class MarsRecyclingGame {
 
     // Handle canvas clicks for module selection
     handleCanvasClick(event) {
+        const rect = this.canvas.getBoundingClientRect();
+        const scaleX = this.canvas.width / rect.width;
+        const scaleY = this.canvas.height / rect.height;
+
+        const x = (event.clientX - rect.left) * scaleX;
+        const y = (event.clientY - rect.top) * scaleY;
+
+        if (this.currentView === 'product-rack') {
+            // Handle product rack interactions
+            this.handleProductRackClick(x, y);
+            return;
+        }
+
         if (this.currentView === 'interior') {
             // If in interior view, return to habitat view
             this.currentView = 'habitat';
@@ -2095,13 +2886,6 @@ class MarsRecyclingGame {
             this.renderHabitat();
             return;
         }
-
-        const rect = this.canvas.getBoundingClientRect();
-        const scaleX = this.canvas.width / rect.width;
-        const scaleY = this.canvas.height / rect.height;
-
-        const x = (event.clientX - rect.left) * scaleX;
-        const y = (event.clientY - rect.top) * scaleY;
 
         // Check if click is within any module bounds
         console.log('Canvas clicked at:', x, y);
@@ -2135,6 +2919,631 @@ class MarsRecyclingGame {
                 break;
             }
         }
+    }
+
+    // Handle clicks on the product rack
+    handleProductRackClick(x, y) {
+        // Check if back button was clicked
+        if (this.backButtonBounds &&
+            x >= this.backButtonBounds.x && x <= this.backButtonBounds.x + this.backButtonBounds.width &&
+            y >= this.backButtonBounds.y && y <= this.backButtonBounds.y + this.backButtonBounds.height) {
+
+            // Return to habitat view
+            this.currentView = 'habitat';
+            this.needsRedraw = true;
+            this.renderHabitat();
+            this.showNotification('🏠 Returned to habitat overview');
+            return;
+        }
+
+        // Check if any recyclable item was clicked
+        this.recyclableItems.forEach(item => {
+            if (item.bounds && item.count > 0 &&
+                x >= item.bounds.x && x <= item.bounds.x + item.bounds.width &&
+                y >= item.bounds.y && y <= item.bounds.y + item.bounds.height) {
+
+                this.selectRecyclableItem(item);
+            }
+        });
+    }
+
+    // Handle selection of recyclable items
+    selectRecyclableItem(item) {
+        if (item.count <= 0) {
+            this.showNotification(`❌ No ${item.name} available for recycling`);
+            return;
+        }
+
+        // Add to selected items or show recycling options
+        this.showNotification(`✅ Selected ${item.name} for recycling`);
+
+        // Show available recycling options for this item
+        this.showRecyclingOptionsForItem(item);
+    }
+
+    // Show recycling options for selected item
+    showRecyclingOptionsForItem(item) {
+        // Find recycling systems that can use this item
+        const availableRecycling = this.recyclingSystems.filter(system =>
+            system.input.hasOwnProperty(item.id)
+        );
+
+        if (availableRecycling.length === 0) {
+            this.showNotification(`❌ No recycling options available for ${item.name}`);
+            return;
+        }
+
+        // Create a temporary overlay showing recycling options
+        const overlay = document.createElement('div');
+        overlay.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        `;
+
+        const optionsHtml = availableRecycling.map(system => {
+            const canUse = this.canRecycle(system);
+            const inputText = Object.entries(system.input)
+                .map(([resource, amount]) => `${amount} ${resource}`)
+                .join(', ');
+            const outputText = Object.entries(system.output)
+                .map(([product, amount]) => `${amount} ${product}`)
+                .join(', ');
+
+            return `
+                <div style="
+                    background: linear-gradient(135deg, rgba(0, 150, 255, 0.1) 0%, rgba(0, 100, 200, 0.1) 100%);
+                    border: 1px solid rgba(0, 150, 255, 0.3);
+                    border-radius: 10px;
+                    padding: 15px;
+                    margin: 10px 0;
+                ">
+                    <h4 style="color: #00BFFF; margin-bottom: 8px;">${system.name}</h4>
+                    <p style="color: #ccc; font-size: 12px; margin-bottom: 8px;">
+                        Needs: ${inputText}<br>
+                        Power: 100% | Water: 100L<br>
+                        Produces: ${outputText}
+                    </p>
+                    <button onclick="game.executeRecyclingFromOverlay('${system.id}', this);" 
+                            style="
+                                background: linear-gradient(135deg, #FF6B35, #E55A2B);
+                                color: white;
+                                border: none;
+                                padding: 8px 15px;
+                                border-radius: 5px;
+                                cursor: pointer;
+                                font-weight: bold;
+                            ">
+                        Recycle Now
+                    </button>
+                </div>
+            `;
+        }).join('');
+
+        overlay.innerHTML = `
+            <div class="recycling-options-overlay" style="
+                background: linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(20, 20, 40, 0.95) 100%);
+                border: 2px solid rgba(0, 150, 255, 0.3);
+                border-radius: 15px;
+                padding: 30px;
+                max-width: 500px;
+                max-height: 80vh;
+                overflow-y: auto;
+            ">
+                <h3 style="color: #00BFFF; text-align: center; margin-bottom: 20px;">
+                    🔄 Recycling Options for ${item.name}
+                </h3>
+                ${optionsHtml}
+                <div style="text-align: center; margin-top: 20px;">
+                    <button onclick="game.cancelRecyclingOptions(this);" style="
+                        background: #FF6B35;
+                        color: white;
+                        border: none;
+                        padding: 10px 20px;
+                        border-radius: 5px;
+                        cursor: pointer;
+                    ">Cancel</button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(overlay);
+    }
+
+    // Cancel recycling options and refresh display
+    cancelRecyclingOptions(buttonElement) {
+        // Remove the overlay
+        const overlay = buttonElement.closest('.recycling-options-overlay').parentElement;
+        if (overlay) {
+            overlay.remove();
+        }
+
+        // Force a re-render of the product rack
+        this.needsRedraw = true;
+        this.renderProductRack();
+    }
+
+    // Execute recycling process from overlay
+    executeRecyclingFromOverlay(systemId, buttonElement) {
+        // Check if this is the dust trap recycling option
+        if (systemId === 'fabric-to-dust-trap') {
+            // Show visual recycling process for dust trap
+            this.showDustTrapRecyclingProcess(buttonElement);
+            return;
+        }
+
+        // Check if this is the birthday decoration recycling option
+        if (systemId === 'old-cloth-to-birthday-decoration') {
+            // Show visual recycling process for birthday decoration
+            this.showBirthdayDecorationRecyclingProcess(buttonElement);
+            return;
+        }
+
+        // Remove the overlay first
+        const overlay = buttonElement.closest('.recycling-options-overlay').parentElement;
+        if (overlay) {
+            overlay.remove();
+        }
+
+        // Execute the recycling
+        this.executeRecycling(systemId);
+    }
+
+    // Show visual dust trap recycling process
+    showDustTrapRecyclingProcess(buttonElement) {
+        // Remove the original overlay
+        const originalOverlay = buttonElement.closest('.recycling-options-overlay').parentElement;
+        if (originalOverlay) {
+            originalOverlay.remove();
+        }
+
+        // Create the visual process overlay
+        const processOverlay = document.createElement('div');
+        processOverlay.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        `;
+
+        processOverlay.innerHTML = `
+            <div style="
+                background: linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(20, 20, 40, 0.95) 100%);
+                border: 2px solid rgba(0, 150, 255, 0.3);
+                border-radius: 15px;
+                padding: 30px;
+                max-width: 600px;
+                text-align: center;
+                color: white;
+            ">
+                <h2 style="color: #00BFFF; margin-bottom: 20px;">🧲 Electrostatic Dust Trap Creation</h2>
+                
+                <div id="transformation-container" style="
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    margin: 20px 0;
+                    gap: 20px;
+                    position: relative;
+                    height: 220px;
+                ">
+                    <!-- Input (Woolen Cloth) -->
+                    <div id="input-image" style="
+                        width: 200px;
+                        height: 200px;
+                        background: url('wool.png') center/contain no-repeat;
+                        border: 2px solid #FFD700;
+                        border-radius: 10px;
+                        position: relative;
+                        transform: translateX(120px);
+                        transition: transform 1.5s ease-in-out;
+                    ">
+                        <div style="
+                            position: absolute;
+                            bottom: -10px;
+                            left: 50%;
+                            transform: translateX(-50%);
+                            background: #FFD700;
+                            color: black;
+                            padding: 5px 10px;
+                            border-radius: 5px;
+                            font-size: 12px;
+                            font-weight: bold;
+                        ">Woolen Cloth</div>
+                    </div>
+
+                    <!-- Arrow (initially hidden) -->
+                    <div id="transformation-arrow" style="
+                        font-size: 48px;
+                        color: #FF6B35;
+                        opacity: 0;
+                        transition: opacity 0.5s ease-in-out;
+                        margin: 0 20px;
+                    ">→</div>
+
+                    <!-- Output (Electrostatic Dust Trap Wipe - initially hidden) -->
+                    <div id="output-image" style="
+                        width: 200px;
+                        height: 200px;
+                        background: url('wipe.png') center/contain no-repeat;
+                        border: 2px solid #50E3C2;
+                        border-radius: 10px;
+                        position: relative;
+                        opacity: 0;
+                        transform: translateX(50px);
+                        transition: all 1.5s ease-in-out;
+                    ">
+                        <div style="
+                            position: absolute;
+                            bottom: -10px;
+                            left: 50%;
+                            transform: translateX(-50%);
+                            background: #50E3C2;
+                            color: black;
+                            padding: 5px 10px;
+                            border-radius: 5px;
+                            font-size: 12px;
+                            font-weight: bold;
+                        ">Dust Trap Wipe</div>
+                    </div>
+                </div>
+
+                <div id="process-steps" style="margin: 20px 0; text-align: left;">
+                    <div class="process-step" style="margin: 10px 0; opacity: 0.3; transition: opacity 0.5s;">
+                        <strong style="color: #FF6B35;">Process:</strong> Embed copper/aluminum filaments from thermal pouch layers
+                    </div>
+                    <div class="process-step" style="margin: 10px 0; opacity: 0.3; transition: opacity 0.5s;">
+                        <strong style="color: #00BFFF;">Charging:</strong> Apply static current to activate electrostatic properties
+                    </div>
+                    <div class="process-step" style="margin: 10px 0; opacity: 0.3; transition: opacity 0.5s;">
+                        <strong style="color: #50E3C2;">Output:</strong> Electrostatic Dust Trap Wipe
+                    </div>
+                    <div class="process-step" style="margin: 10px 0; opacity: 0.3; transition: opacity 0.5s;">
+                        <strong style="color: #FFD700;">Benefit:</strong> Active dust-attracting cleaning cloth for Mars environment
+                    </div>
+                </div>
+
+                <div id="success-message" style="
+                    margin: 20px 0;
+                    padding: 15px;
+                    background: linear-gradient(135deg, rgba(0, 255, 0, 0.2) 0%, rgba(0, 200, 0, 0.2) 100%);
+                    border: 2px solid #00FF00;
+                    border-radius: 10px;
+                    opacity: 0;
+                    transition: opacity 0.5s;
+                ">
+                    <h3 style="color: #00FF00; margin: 0;">✅ Successfully Recycled!</h3>
+                    <p style="margin: 5px 0 0 0;">Woolen cloth transformed into Electrostatic Dust Trap Wipe</p>
+                </div>
+
+                <button id="continue-btn" style="
+                    background: #666;
+                    color: white;
+                    border: none;
+                    padding: 10px 20px;
+                    border-radius: 5px;
+                    cursor: pointer;
+                    opacity: 0;
+                    transition: opacity 0.5s;
+                ">Continue</button>
+            </div>
+        `;
+
+        document.body.appendChild(processOverlay);
+
+        // Animate the process steps
+        this.animateRecyclingProcess(processOverlay);
+    }
+
+    // Animate the recycling process steps
+    animateRecyclingProcess(overlay) {
+        const steps = overlay.querySelectorAll('.process-step');
+        const successMessage = overlay.querySelector('#success-message');
+        const continueBtn = overlay.querySelector('#continue-btn');
+        const inputImage = overlay.querySelector('#input-image');
+        const outputImage = overlay.querySelector('#output-image');
+        const arrow = overlay.querySelector('#transformation-arrow');
+
+        let currentStep = 0;
+
+        const showNextStep = () => {
+            if (currentStep < steps.length) {
+                steps[currentStep].style.opacity = '1';
+                currentStep++;
+                setTimeout(showNextStep, 1000);
+            } else {
+                // After all steps, start the transformation animation
+                setTimeout(() => {
+                    this.startTransformationAnimation(inputImage, outputImage, arrow, successMessage, continueBtn, overlay);
+                }, 500);
+            }
+        };
+
+        // Start the animation
+        setTimeout(showNextStep, 500);
+    }
+
+    // Handle the transformation animation
+    startTransformationAnimation(inputImage, outputImage, arrow, successMessage, continueBtn, overlay) {
+        // Step 1: Keep woolen cloth in the middle initially (no movement)
+
+        // Step 2: Slide woolen cloth to the left first
+        setTimeout(() => {
+            inputImage.style.transform = 'translateX(-2px)';
+        }, 1000);
+
+        // Step 3: Show arrow AFTER cloth slides left
+        setTimeout(() => {
+            arrow.style.opacity = '1';
+        }, 1800);
+
+        // Step 4: Show success message before woolen cloth slides
+        setTimeout(() => {
+            successMessage.style.opacity = '1';
+        }, 300);
+
+        // Step 5: Show output wipe.png from the right after cloth moves left
+        setTimeout(() => {
+            outputImage.style.opacity = '1';
+            outputImage.style.transform = 'translateX(0px)';
+        }, 2800);
+
+        // Step 6: Show continue button AFTER wipe slides in
+        setTimeout(() => {
+            continueBtn.style.opacity = '1';
+            continueBtn.style.background = '#FF6B35';
+            continueBtn.style.cursor = 'pointer';
+
+            continueBtn.onclick = () => {
+                overlay.remove();
+                // Execute the actual recycling
+                this.executeRecycling('fabric-to-dust-trap');
+            };
+        }, 3200);
+    }
+
+    // Show visual birthday decoration recycling process
+    showBirthdayDecorationRecyclingProcess(buttonElement) {
+        // Remove the original overlay
+        const originalOverlay = buttonElement.closest('.recycling-options-overlay').parentElement;
+        if (originalOverlay) {
+            originalOverlay.remove();
+        }
+
+        // Create the visual process overlay
+        const processOverlay = document.createElement('div');
+        processOverlay.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        `;
+
+        processOverlay.innerHTML = `
+            <div style="
+                background: linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(40, 20, 60, 0.95) 100%);
+                border: 2px solid rgba(255, 105, 180, 0.3);
+                border-radius: 15px;
+                padding: 30px;
+                max-width: 600px;
+                text-align: center;
+                color: white;
+            ">
+                <h2 style="color: #FF69B4; margin-bottom: 20px;">🎉 Birthday Decoration Creation</h2>
+                
+                <div id="transformation-container" style="
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    margin: 20px 0;
+                    gap: 20px;
+                    position: relative;
+                    height: 180px;
+                ">
+                    <!-- Input (Old Cloth) -->
+                    <div id="input-image" style="
+                        width: 200px;
+                        height: 200px;
+                        background: url('old.png') center/contain no-repeat;
+                        border: 2px solid #FFD700;
+                        border-radius: 10px;
+                        position: relative;
+                        transform: translateX(120px);
+                        transition: transform 1.5s ease-in-out;
+                    ">
+                        <div style="
+                            position: absolute;
+                            bottom: -10px;
+                            left: 50%;
+                            transform: translateX(-50%);
+                            background: #FFD700;
+                            color: black;
+                            padding: 5px 10px;
+                            border-radius: 5px;
+                            font-size: 12px;
+                            font-weight: bold;
+                        ">Old Cloth</div>
+                    </div>
+
+                    <!-- Arrow (initially hidden) -->
+                    <div id="transformation-arrow" style="
+                        font-size: 48px;
+                        color: #FF69B4;
+                        opacity: 0;
+                        transition: opacity 0.5s ease-in-out;
+                        margin: 0 20px;
+                    ">→</div>
+
+                    <!-- Output (Birthday Decoration - initially hidden) -->
+                    <div id="output-image" style="
+                        width: 200px;
+                        height: 200px;
+                        background: url('b1.png') center/contain no-repeat;
+                        border: 2px solid #FF69B4;
+                        border-radius: 10px;
+                        position: relative;
+                        opacity: 0;
+                        transform: translateX(50px);
+                        transition: all 1.5s ease-in-out;
+                    ">
+                        <div style="
+                            position: absolute;
+                            bottom: -10px;
+                            left: 50%;
+                            transform: translateX(-50%);
+                            background: #FF69B4;
+                            color: white;
+                            padding: 5px 10px;
+                            border-radius: 5px;
+                            font-size: 12px;
+                            font-weight: bold;
+                        ">Birthday Decoration</div>
+                    </div>
+                </div>
+
+                <div id="process-steps" style="margin: 20px 0; text-align: left;">
+                    <div class="process-step" style="margin: 10px 0; opacity: 0.3; transition: opacity 0.5s;">
+                        <strong style="color: #FF69B4;">Process:</strong> Cut, dye, and shape old cloth into colorful party decorations
+                    </div>
+                    <div class="process-step" style="margin: 10px 0; opacity: 0.3; transition: opacity 0.5s;">
+                        <strong style="color: #FFD700;">Crafting:</strong> Add festive patterns and vibrant colors to create party atmosphere
+                    </div>
+                    <div class="process-step" style="margin: 10px 0; opacity: 0.3; transition: opacity 0.5s;">
+                        <strong style="color: #FF69B4;">Output:</strong> Festive Birthday Decorations
+                    </div>
+                    <div class="process-step" style="margin: 10px 0; opacity: 0.3; transition: opacity 0.5s;">
+                        <strong style="color: #FFD700;">Benefit:</strong> Boost crew morale with celebratory decorations for special occasions
+                    </div>
+                </div>
+
+                <div id="success-message" style="
+                    margin: 20px 0;
+                    padding: 15px;
+                    background: linear-gradient(135deg, rgba(255, 105, 180, 0.2) 0%, rgba(255, 20, 147, 0.2) 100%);
+                    border: 2px solid #FF69B4;
+                    border-radius: 10px;
+                    opacity: 0;
+                    transition: opacity 0.5s;
+                ">
+                    <h3 style="color: #FF69B4; margin: 0;">✅ Successfully Recycled!</h3>
+                    <p style="margin: 5px 0 0 0;">Old cloth transformed into Birthday Decorations</p>
+                </div>
+
+                <button id="continue-btn" style="
+                    background: #666;
+                    color: white;
+                    border: none;
+                    padding: 10px 20px;
+                    border-radius: 5px;
+                    cursor: pointer;
+                    opacity: 0;
+                    transition: opacity 0.5s;
+                ">Continue</button>
+            </div>
+        `;
+
+        document.body.appendChild(processOverlay);
+
+        // Animate the process steps
+        this.animateBirthdayDecorationRecyclingProcess(processOverlay);
+    }
+
+    // Animate the birthday decoration recycling process steps
+    animateBirthdayDecorationRecyclingProcess(overlay) {
+        const steps = overlay.querySelectorAll('.process-step');
+        const successMessage = overlay.querySelector('#success-message');
+        const continueBtn = overlay.querySelector('#continue-btn');
+        const inputImage = overlay.querySelector('#input-image');
+        const outputImage = overlay.querySelector('#output-image');
+        const arrow = overlay.querySelector('#transformation-arrow');
+
+        let currentStep = 0;
+
+        const showNextStep = () => {
+            if (currentStep < steps.length) {
+                steps[currentStep].style.opacity = '1';
+                currentStep++;
+                setTimeout(showNextStep, 1000);
+            } else {
+                // After all steps, start the transformation animation
+                setTimeout(() => {
+                    this.startBirthdayDecorationTransformationAnimation(inputImage, outputImage, arrow, successMessage, continueBtn, overlay);
+                }, 500);
+            }
+        };
+
+        // Start the animation
+        setTimeout(showNextStep, 500);
+    }
+
+    // Handle the birthday decoration transformation animation
+    startBirthdayDecorationTransformationAnimation(inputImage, outputImage, arrow, successMessage, continueBtn, overlay) {
+        // Step 1: Show arrow
+        setTimeout(() => {
+            arrow.style.opacity = '1';
+        }, 500);
+
+        // Step 2: Move old cloth to the left
+        setTimeout(() => {
+            inputImage.style.transform = 'translateX(-2px)';
+        }, 1000);
+
+        // Step 3: Show success message
+        setTimeout(() => {
+            successMessage.style.opacity = '1';
+        }, 300);
+
+        // Step 4: Show output birthday decoration from the right
+        setTimeout(() => {
+            outputImage.style.opacity = '1';
+            outputImage.style.transform = 'translateX(0px)';
+        }, 2800);
+
+        // Step 5: Show continue button
+        setTimeout(() => {
+            continueBtn.style.opacity = '1';
+            continueBtn.style.background = '#FF69B4';
+            continueBtn.style.cursor = 'pointer';
+
+            continueBtn.onclick = () => {
+                overlay.remove();
+                // Execute the actual recycling
+                this.executeRecycling('old-cloth-to-birthday-decoration');
+            };
+        }, 3200);
+    }
+
+    // Execute recycling process
+    executeRecycling(systemId) {
+        this.recycle(systemId);
+
+        // Update the product rack display
+        this.recyclableItems.forEach(item => {
+            item.count = this.waste[item.id] || 0;
+        });
+
+        // Force a re-render of the product rack
+        this.needsRedraw = true;
+        this.renderProductRack();
     }
 
     // Switch to panel based on clicked module
@@ -2193,13 +3602,12 @@ class MarsRecyclingGame {
         }
 
         // Update hover states
-        let needsRedraw = false;
         for (let module of this.modules) {
             const wasHovered = module.hovered;
             module.hovered = (module === hoveredModule);
 
             if (wasHovered !== module.hovered) {
-                needsRedraw = true;
+                this.needsRedraw = true;
             }
         }
 
@@ -2214,19 +3622,15 @@ class MarsRecyclingGame {
             }
         }
 
-        // Redraw if hover state changed
-        if (needsRedraw && !this.canvasBackgroundHidden) {
-            this.renderHabitat();
-        }
+        // Redraw will happen in animation loop if needed
     }
 
     // Clear all hover states
     clearAllHoverStates() {
-        let needsRedraw = false;
         for (let module of this.modules) {
             if (module.hovered) {
                 module.hovered = false;
-                needsRedraw = true;
+                this.needsRedraw = true;
             }
         }
 
@@ -2234,9 +3638,18 @@ class MarsRecyclingGame {
 
         this.canvas.style.cursor = 'default';
 
-        if (needsRedraw && !this.canvasBackgroundHidden) {
-            this.renderHabitat();
-        }
+        // Redraw will happen in animation loop if needed
+    }
+
+    getModuleTooltipText(module) {
+        const tooltips = {
+            living: 'Living Quarters - Crew rest and personal space',
+            lab: 'Research Lab - Scientific analysis and experiments',
+            recycling: 'Recycling Bay - Waste processing systems',
+            storage: 'Storage - Equipment and supplies',
+            greenhouse: 'Greenhouse - Food production and life support'
+        };
+        return tooltips[module.type] || 'Unknown module';
     }
 
     // Draw tooltip for hovered module
@@ -2536,7 +3949,7 @@ class MarsRecyclingGame {
         this.ctx.fillStyle = '#ECF0F1';
         this.ctx.font = 'bold 24px monospace';
         this.ctx.textAlign = 'center';
-        this.ctx.fillText(module.name, this.canvas.width / 2, 60);
+        this.ctx.fillText(this.selectedModule ? this.selectedModule.name : 'Interior View', this.canvas.width / 2, 60);
     }
 
     drawLivingQuartersInterior(area) {

@@ -16,7 +16,7 @@
                 <span>Sol: <span id="sol-counter">1</span></span>
                 <span>Crew: <span id="crew-count">4</span></span>
                 <span>Power: <span id="power-level">100</span>%</span>
-                <span>Water: <span id="water-level">85</span>L</span>
+                <span>Water: <span id="water-level">100</span>L</span>
             </div>
         </header>
 
@@ -39,7 +39,7 @@
                     </div>
                     <div class="nav-label">MENU</div>
                 </div>
-                <div class="nav-item active" data-panel="crew-section" data-tooltip="Crew Status"
+                <div class="nav-item" data-panel="crew-section" data-tooltip="Crew Status"
                     onclick="game.switchPanel('crew-section')">
                     <div class="nav-icon">👨‍🚀</div>
                     <div class="nav-label">Crew</div>
@@ -59,6 +59,11 @@
                     <div class="nav-icon">📦</div>
                     <div class="nav-label">Products</div>
                 </div>
+                <div class="nav-item active" data-panel="party-progress" data-tooltip="Party Progress"
+                    onclick="game.switchPanel('party-progress')">
+                    <div class="nav-icon">🎉</div>
+                    <div class="nav-label">Party</div>
+                </div>
                 <div class="nav-item" data-panel="background-controls" data-tooltip="Background Settings"
                     onclick="game.switchPanel('background-controls')">
                     <div class="nav-icon">🎨</div>
@@ -73,7 +78,7 @@
 
             <!-- Content Panels -->
             <div id="panel-content">
-                <div id="crew-section" class="content-panel active">
+                <div id="crew-section" class="content-panel">
                     <div class="panel-header">
                         <h3>👨‍🚀 Crew Status</h3>
                         <div class="panel-subtitle">Mission Personnel</div>
@@ -118,6 +123,58 @@
                         <div class="panel-subtitle">Manufactured Items</div>
                     </div>
                     <div id="products-list"></div>
+                </div>
+
+                <div id="party-progress" class="content-panel active">
+                    <div class="panel-header">
+                        <h3>🎉 Party Progress</h3>
+                        <div class="panel-subtitle">Birthday Celebration Items</div>
+                    </div>
+                    <div id="party-items-list">
+                        <div class="party-item">
+                            <div class="party-item-header">
+                                <span class="party-icon">🎉</span>
+                                <span class="party-name">Birthday Decorations</span>
+                                <span class="party-count" id="party-decorations-count">0</span>
+                            </div>
+                            <div class="party-requirement">Need: 1 Fabric → Recycle with Birthday Decoration Maker</div>
+                            <div class="party-status" id="party-decorations-status">❌ Not Ready</div>
+                        </div>
+                        
+                        <div class="party-item">
+                            <div class="party-item-header">
+                                <span class="party-icon">🥡</span>
+                                <span class="party-name">Party Containers</span>
+                                <span class="party-count" id="party-containers-count">0</span>
+                            </div>
+                            <div class="party-requirement">Need: 2 Packaging → Recycle with Party Container Fabricator</div>
+                            <div class="party-status" id="party-containers-status">❌ Not Ready</div>
+                        </div>
+                        
+                        <div class="party-item">
+                            <div class="party-item-header">
+                                <span class="party-icon">🎈</span>
+                                <span class="party-name">Party Balloons</span>
+                                <span class="party-count" id="party-balloons-count">0</span>
+                            </div>
+                            <div class="party-requirement">Need: 2 Foam → Recycle with Party Balloon Maker</div>
+                            <div class="party-status" id="party-balloons-status">❌ Not Ready</div>
+                        </div>
+                    </div>
+                    
+                    <div id="party-overall-status" class="party-overall">
+                        <div class="party-overall-header">🎊 Overall Party Status</div>
+                        <div class="party-overall-message" id="party-overall-message">
+                            Collect and recycle all 3 item types to start the party!
+                        </div>
+                        <div class="party-progress-bar">
+                            <div class="party-progress-fill" id="party-progress-fill" style="width: 0%;"></div>
+                        </div>
+                        <div class="party-progress-text" id="party-progress-text">0/3 Items Ready</div>
+                        <div style="margin-top: 10px; font-size: 11px; color: #888; font-style: italic;">
+                            💡 Tip: Collect waste materials and use the recycling systems to create party items!
+                        </div>
+                    </div>
                 </div>
 
                 <div id="background-controls" class="content-panel">
@@ -181,8 +238,11 @@
                         
                         <div class="test-controls" style="margin-top: 20px; padding: 15px; border: 1px solid #00BFFF; border-radius: 8px;">
                             <h4 style="color: #00BFFF; margin-bottom: 10px;">Test Controls</h4>
-                            <button onclick="game.showRecyclingBayDialogue()" style="background: #00BFFF; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-weight: bold;">
+                            <button onclick="game.showRecyclingBayDialogue()" style="background: #00BFFF; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; margin-right: 10px;">
                                 Test Recycling Bay Dialogue
+                            </button>
+                            <button onclick="game.testPartyProgress()" style="background: #FF69B4; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-weight: bold;">
+                                Test Party Progress
                             </button>
                         </div>
                     </div>
@@ -203,10 +263,6 @@
     </main>
 
     <div id="notifications"></div>
-
-    </div>
-    </div>
-    </div>
 
     <script src="game.js"></script>
 </body>

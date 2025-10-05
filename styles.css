@@ -1049,6 +1049,36 @@ arrative message styling */
     transform: none;
 }
 
+.recycling-option button.recycled-button {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;
+    border: 1px solid rgba(40, 167, 69, 0.5) !important;
+    color: white !important;
+    cursor: default !important;
+    opacity: 1 !important;
+}
+
+.recycling-option button.recycled-button:hover {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;
+    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.5) !important;
+}
+
+.recycling-option button.not-recycled-button {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%) !important;
+    border: 1px solid rgba(220, 53, 69, 0.5) !important;
+    color: white !important;
+}
+
+.recycling-option button.not-recycled-button:hover:not(:disabled) {
+    background: linear-gradient(135deg, #c82333 0%, #bd2130 100%) !important;
+    box-shadow: 0 4px 15px rgba(220, 53, 69, 0.5) !important;
+}
+
+.recycling-option button.not-recycled-button:disabled {
+    background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%) !important;
+    border: 1px solid rgba(108, 117, 125, 0.5) !important;
+    opacity: 0.6 !important;
+}
+
 /* Mission status indicators with better visual hierarchy */
 #mission-status {
     display: flex;
@@ -1738,7 +1768,8 @@ arrative message styling */
     }
 }
 
-* Habitat Module Panel Styles */ .habitat-info,
+/* Habitat Module Panel Styles */
+.habitat-info,
 .lab-equipment,
 .storage-capacity,
 .greenhouse-stats {
@@ -1837,8 +1868,7 @@ arrative message styling */
     cursor: crosshair;
 }
 
-/* Li
-ving Quarters Module Button */
+/* Living Quarters Module Button */
 .module-button {
     position: absolute;
     background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
@@ -1890,4 +1920,136 @@ ving Quarters Module Button */
     display: flex;
     align-items: center;
     justify-content: center;
+}
+/* 
+Party Progress Panel Styling */
+.party-item {
+    background: linear-gradient(135deg, rgba(255, 105, 180, 0.1) 0%, rgba(255, 20, 147, 0.1) 100%);
+    border: 1px solid rgba(255, 105, 180, 0.3);
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 15px;
+    transition: all 0.3s ease;
+}
+
+.party-item:hover {
+    background: linear-gradient(135deg, rgba(255, 105, 180, 0.2) 0%, rgba(255, 20, 147, 0.2) 100%);
+    border-color: rgba(255, 105, 180, 0.5);
+    transform: translateY(-2px);
+}
+
+.party-item-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.party-icon {
+    font-size: 20px;
+    margin-right: 10px;
+}
+
+.party-name {
+    flex: 1;
+    font-weight: bold;
+    color: #FF69B4;
+    font-size: 14px;
+}
+
+.party-count {
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    color: #8B4513;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-weight: bold;
+    font-size: 12px;
+    min-width: 20px;
+    text-align: center;
+}
+
+.party-requirement {
+    font-size: 11px;
+    color: #ccc;
+    margin-bottom: 5px;
+    font-style: italic;
+}
+
+.party-status {
+    font-size: 12px;
+    font-weight: bold;
+    padding: 3px 8px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.party-status.ready {
+    background: rgba(0, 255, 0, 0.2);
+    color: #00FF00;
+    border: 1px solid rgba(0, 255, 0, 0.3);
+}
+
+.party-status.not-ready {
+    background: rgba(255, 0, 0, 0.2);
+    color: #FF6666;
+    border: 1px solid rgba(255, 0, 0, 0.3);
+}
+
+.party-overall {
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, rgba(255, 140, 0, 0.1) 100%);
+    border: 2px solid rgba(255, 215, 0, 0.3);
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 20px;
+    text-align: center;
+}
+
+.party-overall-header {
+    font-size: 16px;
+    font-weight: bold;
+    color: #FFD700;
+    margin-bottom: 10px;
+}
+
+.party-overall-message {
+    font-size: 12px;
+    color: #ccc;
+    margin-bottom: 15px;
+}
+
+.party-progress-bar {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    height: 20px;
+    margin-bottom: 8px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 215, 0, 0.3);
+}
+
+.party-progress-fill {
+    background: linear-gradient(135deg, #FFD700, #FF69B4, #00BFFF);
+    height: 100%;
+    border-radius: 10px;
+    transition: width 0.5s ease;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+.party-progress-text {
+    font-size: 12px;
+    font-weight: bold;
+    color: #FFD700;
+}
+
+.party-overall.ready {
+    background: linear-gradient(135deg, rgba(0, 255, 0, 0.1) 0%, rgba(50, 205, 50, 0.1) 100%);
+    border-color: rgba(0, 255, 0, 0.5);
+    animation: party-ready-glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes party-ready-glow {
+    0% {
+        box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+    }
+    100% {
+        box-shadow: 0 0 30px rgba(0, 255, 0, 0.6), 0 0 40px rgba(255, 215, 0, 0.4);
+    }
 }

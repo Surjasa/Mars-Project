@@ -212,6 +212,10 @@ class MarsRecyclingGame {
         // Initialize party system
         this.partyTriggered = false;
 
+        // Initialize research lab scroll system
+        this.researchScrollOffset = 0;
+        this.maxScrollOffset = 0;
+
         // Rendering optimization
         this.needsRedraw = true;
 
@@ -234,6 +238,8 @@ class MarsRecyclingGame {
         this.canvas.addEventListener('dblclick', (event) => {
             if (this.currentView === 'interior') {
                 this.exitInteriorView();
+            } else if (this.currentView === 'research-lab') {
+                this.exitResearchLabView();
             }
         });
 
@@ -245,6 +251,16 @@ class MarsRecyclingGame {
         // Add canvas mouseleave listener to clear hover states
         this.canvas.addEventListener('mouseleave', () => {
             this.clearAllHoverStates();
+        });
+
+        // Add wheel event listener for scrolling in research lab
+        this.canvas.addEventListener('wheel', (event) => {
+            this.handleCanvasScroll(event);
+        }, { passive: false });
+
+        // Add keyboard controls for scrolling
+        document.addEventListener('keydown', (event) => {
+            this.handleKeyboardScroll(event);
         });
 
 
@@ -260,6 +276,8 @@ class MarsRecyclingGame {
 
                 if (this.currentView === 'interior') {
                     this.navigateInterior('back');
+                } else if (this.currentView === 'research-lab') {
+                    this.exitResearchLabView();
                 } else {
                     this.exitInteriorView();
                 }
@@ -270,6 +288,8 @@ class MarsRecyclingGame {
             nextBtn.addEventListener('click', () => {
                 if (this.currentView === 'interior') {
                     this.navigateInterior('next');
+                } else if (this.currentView === 'research-lab') {
+                    this.exitResearchLabView();
                 } else {
                     this.exitInteriorView();
                 }
@@ -351,12 +371,12 @@ class MarsRecyclingGame {
         wasteTypes.forEach(type => {
             this.waste[type] += Math.floor(Math.random() * 2) + 1;
         });
-        
+
         // Don't show notifications when in interior view
         if (this.currentView !== 'interior') {
             this.showNotification('Daily waste generated from crew activities');
         }
-        
+
         this.updateUI();
     }
 
@@ -438,7 +458,7 @@ class MarsRecyclingGame {
 
         const hasAllItems = Object.values(birthdayItems).every(count => count > 0);
         console.log('Has all items:', hasAllItems);
-        
+
         if (hasAllItems && !this.partyTriggered) {
             console.log('Triggering birthday party!');
             this.partyTriggered = true; // Prevent multiple triggers
@@ -449,7 +469,7 @@ class MarsRecyclingGame {
     showBirthdayPartyDialog(birthdayItems) {
         // Select a random crew member for the birthday
         const crewMember = this.crewMembers[Math.floor(Math.random() * this.crewMembers.length)];
-        
+
         // Calculate total items
         const totalItems = Object.values(birthdayItems).reduce((sum, count) => sum + count, 0);
 
@@ -619,7 +639,7 @@ class MarsRecyclingGame {
     playPartyVideo() {
         const video = document.getElementById('partyVideo');
         const playButton = document.getElementById('playButton');
-        
+
         if (video) {
             video.play().then(() => {
                 // Video started playing successfully
@@ -642,7 +662,7 @@ class MarsRecyclingGame {
             this.videoOverlay.remove();
             this.videoOverlay = null;
         }
-        
+
         // Reset party trigger so it can happen again
         this.partyTriggered = false;
     }
@@ -742,7 +762,7 @@ class MarsRecyclingGame {
                 if (birthdayItems.birthdayDecorations === 0) needed.push('Decorations');
                 if (birthdayItems.partyContainers === 0) needed.push('Containers');
                 if (birthdayItems.partyBalloons === 0) needed.push('Balloons');
-                
+
                 overallMessage.textContent = `Still need: ${needed.join(', ')}`;
                 overallStatus.classList.remove('ready');
             }
@@ -908,6 +928,13 @@ class MarsRecyclingGame {
         // Check if we're in product rack view
         if (this.currentView === 'product-rack') {
             this.renderProductRack();
+            this.needsRedraw = false;
+            return;
+        }
+
+        // Check if we're in research lab view
+        if (this.currentView === 'research-lab') {
+            // Don't clear or redraw - let loadResearchLabBackground handle it
             this.needsRedraw = false;
             return;
         }
@@ -1556,11 +1583,22 @@ class MarsRecyclingGame {
         this.showResearchLabDialogue();
 
         this.showNotification('🔬 Entering Research Lab...');
-        this.toggleCanvasBackgroundWithImage('research2.png');
+
+        // Set up research lab specific view without using the standard interior system
+        this.currentView = 'research-lab';
         this.markModuleAsClicked('lab');
-        this.enterInteriorView('lab');
-        this.switchPanel('crew-section');
+
+        // Show navigation buttons like other interior views
+        const navButtons = document.getElementById('canvas-navigation');
+        if (navButtons) {
+            navButtons.style.display = 'flex';
+        }
+
+        // Don't switch to crew section - we want to show research data
         this.showNotification('🧪 Research Lab interior view activated');
+
+        // Load background image and then draw research data
+        this.loadResearchLabBackground();
     }
 
     handleRecyclingBayClick() {
@@ -1808,6 +1846,93 @@ class MarsRecyclingGame {
         this.renderHabitat();
 
         this.showNotification('🏠 Returned to habitat overview');
+    }
+
+    exitResearchLabView() {
+        // Reset to habitat view
+        this.currentView = 'habitat';
+        this.selectedModule = null;
+
+        // Reset scroll position
+        this.researchScrollOffset = 0;
+
+        // Hide navigation buttons
+        const navButtons = document.getElementById('canvas-navigation');
+        if (navButtons) {
+            navButtons.style.display = 'none';
+        }
+
+        // Clear any module click states
+        this.modules.forEach(module => {
+            module.clicked = false;
+        });
+
+        // Force a redraw
+        this.needsRedraw = true;
+        this.renderHabitat();
+
+        this.showNotification('🏠 Returned to habitat overview from Research Lab');
+    }
+
+    handleCanvasScroll(event) {
+        console.log('Scroll event triggered, currentView:', this.currentView);
+
+        // Only handle scrolling in research lab view
+        if (this.currentView !== 'research-lab') {
+            console.log('Not in research lab view, ignoring scroll');
+            return;
+        }
+
+        event.preventDefault();
+        console.log('Scroll prevented, deltaY:', event.deltaY);
+
+        // Calculate scroll amount
+        const scrollAmount = event.deltaY * 0.5; // Adjust scroll sensitivity
+
+        // Update scroll offset
+        const oldOffset = this.researchScrollOffset;
+        this.researchScrollOffset += scrollAmount;
+
+        // Clamp scroll offset to valid range
+        this.researchScrollOffset = Math.max(0, Math.min(this.researchScrollOffset, this.maxScrollOffset));
+
+        console.log('Scroll offset changed from', oldOffset, 'to', this.researchScrollOffset, 'max:', this.maxScrollOffset);
+
+        // Only redraw the research data boxes without affecting the background
+        this.redrawResearchLabContent();
+    }
+
+    handleKeyboardScroll(event) {
+        // Only handle scrolling in research lab view
+        if (this.currentView !== 'research-lab') {
+            return;
+        }
+
+        let scrollAmount = 0;
+
+        if (event.key === 'ArrowUp' || event.key === 'w' || event.key === 'W') {
+            scrollAmount = -30; // Scroll up
+            event.preventDefault();
+        } else if (event.key === 'ArrowDown' || event.key === 's' || event.key === 'S') {
+            scrollAmount = 30; // Scroll down
+            event.preventDefault();
+        }
+
+        if (scrollAmount !== 0) {
+            console.log('Keyboard scroll:', scrollAmount);
+
+            // Update scroll offset
+            const oldOffset = this.researchScrollOffset;
+            this.researchScrollOffset += scrollAmount;
+
+            // Clamp scroll offset to valid range
+            this.researchScrollOffset = Math.max(0, Math.min(this.researchScrollOffset, this.maxScrollOffset));
+
+            console.log('Keyboard scroll offset changed from', oldOffset, 'to', this.researchScrollOffset);
+
+            // Only redraw the research data boxes without affecting the background
+            this.redrawResearchLabContent();
+        }
     }
 
     navigateInterior(direction) {
@@ -2871,6 +2996,8 @@ class MarsRecyclingGame {
 
         const x = (event.clientX - rect.left) * scaleX;
         const y = (event.clientY - rect.top) * scaleY;
+
+
 
         if (this.currentView === 'product-rack') {
             // Handle product rack interactions
@@ -4036,22 +4163,238 @@ class MarsRecyclingGame {
     }
 
     drawResearchLabInterior() {
-        // Draw lab benches
-        this.ctx.fillStyle = '#95A5A6';
-        this.ctx.fillRect(100, 200, 600, 80);
-        this.ctx.fillRect(100, 350, 600, 80);
+        // When in interior view, the background and research data are handled separately
+        // This method is called by renderModuleInterior, but we handle research lab differently
+        console.log('drawResearchLabInterior called - research data handled by loadResearchLabBackground');
+    }
 
-        // Draw equipment
-        this.ctx.fillStyle = '#2C3E50';
-        this.ctx.fillRect(150, 150, 60, 50);
-        this.ctx.fillRect(300, 150, 80, 50);
-        this.ctx.fillRect(450, 150, 70, 50);
+    drawResearchDataBoxes() {
+        const researchData = [
+            {
+                title: "Ancient Lake & River Delta",
+                content: [
+                    "Jezero Crater used to be a large lake billions of years ago.",
+                    "A river once flowed into it, creating a delta — clear evidence of flowing water in Mars' past."
+                ]
+            },
+            {
+                title: "Water-Formed Rocks and Minerals",
+                content: [
+                    "Scientists found clay, carbonates, and salts — all of which form in water.",
+                    "This proves that liquid water was present for a long time."
+                ]
+            },
+            {
+                title: "Signs of Possible Past Life (Biosignatures)",
+                content: [
+                    "NASA's Perseverance rover found organic molecules (carbon-based materials).",
+                    "These aren't proof of life, but they show the conditions for life may have existed."
+                ]
+            },
+            {
+                title: "Volcanic and Sedimentary Layers",
+                content: [
+                    "Some rocks formed from ancient lava flows, while others formed from sediment in the lake.",
+                    "This mix helps scientists understand Mars' volcanic and watery history."
+                ]
+            },
+            {
+                title: "Preserved River Channels and Delta Structures",
+                content: [
+                    "High-resolution images show clear shapes of river channels and delta fans.",
+                    "These help scientists see how water once flowed and deposited materials."
+                ]
+            },
+            {
+                title: "Clues for Sample Return",
+                content: [
+                    "Perseverance has collected rock and soil samples that may hold ancient microbial evidence.",
+                    "These will be brought back to Earth in future missions for deeper study."
+                ]
+            }
+        ];
 
-        // Draw screens
-        this.ctx.fillStyle = '#27AE60';
-        this.ctx.fillRect(160, 160, 40, 30);
-        this.ctx.fillRect(310, 160, 60, 30);
-        this.ctx.fillRect(460, 160, 50, 30);
+        // Calculate box dimensions and positions for vertical layout
+        const boxWidth = 900;  // Wider boxes since they're stacked vertically
+        const boxHeight = 80;   // Shorter boxes to fit more on screen
+        const margin = 10;      // Smaller margin between boxes
+        const startX = 50;      // Center the boxes horizontally
+        const startY = 50;
+
+        // Calculate total content height and max scroll offset
+        const totalContentHeight = researchData.length * (boxHeight + margin) + 100; // +100 for title and padding
+        // Force scrollable content by making boxes taller or ensuring minimum scroll
+        this.maxScrollOffset = Math.max(200, totalContentHeight - this.canvas.height + 50); // Force at least 200px scroll
+
+        console.log('Research data boxes calculation:');
+        console.log('- Number of boxes:', researchData.length);
+        console.log('- Box height:', boxHeight, 'Margin:', margin);
+        console.log('- Total content height:', totalContentHeight);
+        console.log('- Canvas height:', this.canvas.height);
+        console.log('- Max scroll offset:', this.maxScrollOffset);
+
+        // Draw title (fixed position, not affected by scroll)
+        this.ctx.fillStyle = '#00BFFF';
+        this.ctx.font = 'bold 24px Arial';
+        this.ctx.textAlign = 'center';
+        this.ctx.fillText('RESEARCH DATA', this.canvas.width / 2, 30);
+
+        // Navigation is handled by the standard ←→ buttons in the UI
+
+        // Draw each research data box vertically (one after another)
+        researchData.forEach((data, index) => {
+            const x = startX;
+            const y = startY + 40 + index * (boxHeight + margin) - this.researchScrollOffset;
+
+            // Only draw boxes that are visible on screen
+            if (y + boxHeight > 0 && y < this.canvas.height) {
+
+                // Draw box background with glow effect
+                this.ctx.shadowColor = '#00BFFF';
+                this.ctx.shadowBlur = 10;
+                this.ctx.fillStyle = 'rgba(0, 50, 100, 0.8)';
+                this.ctx.fillRect(x, y, boxWidth, boxHeight);
+
+                // Draw box border
+                this.ctx.shadowBlur = 0;
+                this.ctx.strokeStyle = '#00BFFF';
+                this.ctx.lineWidth = 2;
+                this.ctx.strokeRect(x, y, boxWidth, boxHeight);
+
+                // Draw title
+                this.ctx.fillStyle = '#FFD700';
+                this.ctx.font = 'bold 14px Arial';
+                this.ctx.textAlign = 'left';
+                this.ctx.fillText(data.title, x + 10, y + 20);
+
+                // Draw content lines (combine both content lines into one for compact display)
+                this.ctx.fillStyle = '#E0E0E0';
+                this.ctx.font = '12px Arial';
+
+                // Combine all content into one string with bullet points
+                const combinedContent = data.content.join(' • ');
+                const words = combinedContent.split(' ');
+                let currentLine = '';
+                let lineY = y + 40;
+
+                // Word wrap for the combined content
+                words.forEach(word => {
+                    const testLine = currentLine + word + ' ';
+                    const metrics = this.ctx.measureText(testLine);
+                    if (metrics.width > boxWidth - 100 && currentLine !== '') {  // Leave space for icon
+                        this.ctx.fillText(currentLine, x + 10, lineY);
+                        currentLine = word + ' ';
+                        lineY += 16;
+                    } else {
+                        currentLine = testLine;
+                    }
+                });
+                if (currentLine) {
+                    this.ctx.fillText(currentLine, x + 10, lineY);
+                }
+
+                // Add data indicator icon
+                this.ctx.fillStyle = '#00FF00';
+                this.ctx.font = '16px Arial';
+                this.ctx.textAlign = 'right';
+                this.ctx.fillText('📊', x + boxWidth - 10, y + 20);
+            } // End visibility check
+        });
+
+        // Draw scroll position indicator if scrollable
+        if (this.maxScrollOffset > 0) {
+            const scrollBarHeight = 100;
+            const scrollBarWidth = 8;
+            const scrollBarX = this.canvas.width - 20;
+            const scrollBarY = 60;
+
+            // Draw scroll track
+            this.ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+            this.ctx.fillRect(scrollBarX, scrollBarY, scrollBarWidth, scrollBarHeight);
+
+            // Draw scroll thumb
+            const thumbHeight = Math.max(10, scrollBarHeight * (this.canvas.height / (this.canvas.height + this.maxScrollOffset)));
+            const thumbY = scrollBarY + (this.researchScrollOffset / this.maxScrollOffset) * (scrollBarHeight - thumbHeight);
+
+            this.ctx.fillStyle = '#00BFFF';
+            this.ctx.fillRect(scrollBarX, thumbY, scrollBarWidth, thumbHeight);
+        }
+
+        // Reset text alignment
+        this.ctx.textAlign = 'left';
+        this.ctx.shadowBlur = 0;
+    }
+
+
+
+    loadResearchLabBackground() {
+        const canvas = document.getElementById('game-canvas');
+        console.log('Loading research lab background...');
+
+        // Clear the canvas first
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+        // Load and draw the background image
+        const backgroundImage = new Image();
+        backgroundImage.onload = () => {
+            console.log('research2.png loaded successfully');
+            // Draw the background image
+            this.ctx.drawImage(backgroundImage, 0, 0, this.canvas.width, this.canvas.height);
+
+            // Add a semi-transparent overlay to make text more readable
+            this.ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+            // Now draw the research data boxes on top
+            this.drawResearchDataBoxes();
+        };
+        backgroundImage.onerror = () => {
+            console.error('Failed to load research2.png');
+            // Fallback: draw a simple background
+            this.ctx.fillStyle = '#2C3E50';
+            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+            // Still draw the research data boxes
+            this.drawResearchDataBoxes();
+        };
+        backgroundImage.src = 'research2.png';
+    }
+
+    redrawResearchLabContent() {
+        // Redraw the research lab background and content for scrolling
+        // This ensures the research2.png background is maintained during scroll
+        
+        // Load and draw the research2.png background
+        const backgroundImage = new Image();
+        backgroundImage.onload = () => {
+            // Clear the entire canvas
+            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            
+            // Draw the research2.png background image
+            this.ctx.drawImage(backgroundImage, 0, 0, this.canvas.width, this.canvas.height);
+
+            // Add a semi-transparent overlay to make text more readable
+            this.ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+            // Now draw the research data boxes on top with current scroll position
+            this.drawResearchDataBoxes();
+        };
+        backgroundImage.onerror = () => {
+            console.error('Failed to load research2.png during scroll redraw');
+            // Fallback: draw a simple background
+            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            this.ctx.fillStyle = '#2C3E50';
+            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+            // Add overlay
+            this.ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+            // Still draw the research data boxes
+            this.drawResearchDataBoxes();
+        };
+        backgroundImage.src = 'research2.png';
     }
 
     drawRecyclingBayInterior() {

@@ -1641,7 +1641,7 @@ class MarsRecyclingGame {
         this.showGreenhouseDialogue();
 
         this.showNotification('🌱 Entering Greenhouse...');
-        this.toggleCanvasBackgroundWithImage('greenhouse.png');
+        this.toggleCanvasBackgroundWithImage('green.png');
         this.markModuleAsClicked('greenhouse');
         this.enterInteriorView('greenhouse');
         this.switchPanel('crew-section');
@@ -1752,7 +1752,8 @@ class MarsRecyclingGame {
                     'research2.png': '#1ABC9C',
                     'recycling.png': '#E67E22',
                     'storage.png': '#9B59B6',
-                    'greenhouse.png': '#27AE60'
+                    'greenhouse.png': '#27AE60',
+                    'green.png': '#27AE60'
                 };
                 this.ctx.fillStyle = fallbackColors[imagePath] || '#34495E';
                 this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
@@ -4363,13 +4364,13 @@ class MarsRecyclingGame {
     redrawResearchLabContent() {
         // Redraw the research lab background and content for scrolling
         // This ensures the research2.png background is maintained during scroll
-        
+
         // Load and draw the research2.png background
         const backgroundImage = new Image();
         backgroundImage.onload = () => {
             // Clear the entire canvas
             this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-            
+
             // Draw the research2.png background image
             this.ctx.drawImage(backgroundImage, 0, 0, this.canvas.width, this.canvas.height);
 

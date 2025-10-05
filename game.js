@@ -1439,32 +1439,32 @@ class MarsRecyclingGame {
     initializeStoryDialogs() {
         this.storyDialogs = [
             {
-                title: "Mars Colony Mission Brief",
-                content: "Welcome to Mars Colony Alpha, Commander. You are part of humanity's first permanent settlement on the Red Planet.",
-                speaker: "Mission Control",
-                icon: ""
+                title: "Mars Mission Brief",
+                content: "During a hypothetical three-year mission to Mars and back, an eight-person crew would accumulate 12,600 kg of inorganic waste, including packaging materials, textiles, and structural materials.",
+                speaker: "Space Technology Mission Directorate",
+                icon: "🚀"
             },
             {
                 title: "The Challenge",
-                content: "Our supply lines from Earth are limited and expensive. Every resource must be carefully managed and recycled to ensure our survival.",
-                speaker: "Colony Administrator",
+                content: "This scenario creates a pressing need to recycle available materials, rather than execute the expensive and inefficient processes of transporting additional resources from Earth or sending trash back to Earth.",
+                speaker: "Mission Control",
                 icon: "⚠️"
             },
             {
                 title: "Your Mission",
-                content: "As the Recycling Operations Manager, your task is to transform waste materials into useful products that will sustain our colony.",
+                content: "As humans prepare to explore unknown worlds, your challenge is to design sustainable systems that could manage, reuse, or recycle inorganic waste accumulated on the surface of Mars.",
                 speaker: "Chief Engineer",
                 icon: "🔧"
             },
             {
-                title: "The Process",
-                content: "Collect various waste items, process them through our recycling systems, and create essential supplies for the colony's continued operation.",
+                title: "Available Resources",
+                content: "Electricity is continuously available for recycling. Water is available but should be minimized. Crew members can operate systems but are busy with other duties. Unlimited Martian regolith (MGS-1 simulant) is available.",
                 speaker: "Resource Specialist",
                 icon: "♻️"
             },
             {
-                title: "Success Criteria",
-                content: "Successfully recycle materials to create tools, building components, and life support supplies. The colony's future depends on your efficiency!",
+                title: "Mission Objectives",
+                content: "Design efficient recycling processes that minimize crew time, water usage, and maximize resource reuse. Convert waste heat and wastewater back into the process to increase efficiency. The future of Mars exploration depends on your innovation!",
                 speaker: "Mission Commander",
                 icon: "🎯"
             }

@@ -156,7 +156,7 @@ main {
 
 #control-panel {
     display: flex;
-    width: 350px;
+    width: 400px;
     min-width: 60px;
     background: linear-gradient(135deg, rgba(0, 0, 0, 0.9) 0%, rgba(20, 20, 40, 0.9) 100%);
     border-radius: 15px;

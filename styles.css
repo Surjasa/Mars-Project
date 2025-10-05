@@ -242,6 +242,70 @@ main {
     font-weight: bold;
 }
 
+/* CSS Hamburger Menu Icon */
+.hamburger-icon {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 18px;
+    height: 14px;
+    cursor: pointer;
+}
+
+.hamburger-icon span {
+    display: block;
+    height: 2px;
+    width: 100%;
+    background: #fff;
+    border-radius: 1px;
+    transition: all 0.3s ease;
+}
+
+.nav-item:hover .hamburger-icon span {
+    background: #00BFFF;
+}
+
+.nav-item.active .hamburger-icon span {
+    background: #00BFFF;
+}
+
+/* Default state: X icon (sidebar expanded) */
+.hamburger-menu .hamburger-icon span:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+}
+
+.hamburger-menu .hamburger-icon span:nth-child(2) {
+    opacity: 0;
+}
+
+.hamburger-menu .hamburger-icon span:nth-child(3) {
+    transform: rotate(-45deg) translate(7px, -6px);
+}
+
+/* Collapsed state: Hamburger icon (sidebar collapsed) */
+#control-panel.collapsed .hamburger-menu .hamburger-icon span:nth-child(1) {
+    transform: rotate(0deg) translate(0px, 0px);
+}
+
+#control-panel.collapsed .hamburger-menu .hamburger-icon span:nth-child(2) {
+    opacity: 1;
+}
+
+#control-panel.collapsed .hamburger-menu .hamburger-icon span:nth-child(3) {
+    transform: rotate(0deg) translate(0px, 0px);
+}
+
+/* Menu label visibility control */
+.hamburger-menu .nav-label {
+    display: none;
+    /* Hide "Menu" text when expanded (X icon) */
+}
+
+#control-panel.collapsed .hamburger-menu .nav-label {
+    display: block;
+    /* Show "Menu" text when collapsed (hamburger icon) */
+}
+
 /* Tooltip for collapsed state */
 .nav-item::after {
     content: attr(data-tooltip);
@@ -276,6 +340,23 @@ main {
 
 #control-panel.collapsed #panel-content {
     display: none;
+}
+
+/* Exception: Keep crew status visible when collapsed */
+#control-panel.collapsed #crew-section.active {
+    display: block;
+    position: absolute;
+    left: 70px;
+    top: 0;
+    width: 280px;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(20, 20, 40, 0.95) 100%);
+    border: 2px solid rgba(0, 150, 255, 0.3);
+    border-left: none;
+    border-radius: 0 15px 15px 0;
+    box-shadow: 0 0 20px rgba(0, 150, 255, 0.2);
+    backdrop-filter: blur(10px);
+    z-index: 1000;
 }
 
 #control-panel.collapsed .nav-label {
@@ -730,9 +811,10 @@ button:disabled {
     position: absolute;
     width: 2px;
     height: 2px;
-    background: rgba(205, 133, 63, 0.3);
+    background: rgba(255, 215, 0, 0.7);
     border-radius: 50%;
-    animation: float-dust 20s linear infinite;
+    box-shadow: 0 0 4px rgba(255, 215, 0, 0.8), 0 0 8px rgba(255, 215, 0, 0.4);
+    animation: float-dust 20s linear infinite, shimmer 3s ease-in-out infinite;
 }
 
 @keyframes float-dust {
@@ -752,6 +834,23 @@ button:disabled {
     100% {
         transform: translateX(10px) translateY(-10px) rotate(360deg);
         opacity: 0;
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        box-shadow: 0 0 4px rgba(255, 215, 0, 0.8), 0 0 8px rgba(255, 215, 0, 0.4);
+        background: rgba(255, 215, 0, 0.7);
+    }
+
+    50% {
+        box-shadow: 0 0 8px rgba(255, 255, 255, 1), 0 0 16px rgba(255, 215, 0, 0.8);
+        background: rgba(255, 255, 255, 0.9);
+    }
+
+    100% {
+        box-shadow: 0 0 4px rgba(255, 215, 0, 0.8), 0 0 8px rgba(255, 215, 0, 0.4);
+        background: rgba(255, 215, 0, 0.7);
     }
 }
 
@@ -1016,6 +1115,176 @@ arrative message styling */
 }
 
 
+
+/* Living Quarters Panel Styling */
+.living-quarters-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.habitat-status {
+    background: linear-gradient(135deg, rgba(0, 150, 255, 0.1) 0%, rgba(0, 100, 200, 0.1) 100%);
+    border: 1px solid rgba(0, 150, 255, 0.3);
+    border-radius: 8px;
+    padding: 15px;
+}
+
+.habitat-status h4 {
+    color: #00BFFF;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+.status-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    padding: 5px 0;
+    border-bottom: 1px solid rgba(0, 150, 255, 0.1);
+}
+
+.status-item:last-child {
+    border-bottom: none;
+}
+
+.canvas-controls {
+    background: linear-gradient(135deg, rgba(255, 107, 53, 0.1) 0%, rgba(255, 140, 0, 0.1) 100%);
+    border: 1px solid rgba(255, 107, 53, 0.3);
+    border-radius: 8px;
+    padding: 15px;
+}
+
+.canvas-controls h4 {
+    color: #FF6B35;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+.toggle-bg-btn {
+    background: linear-gradient(135deg, #FF6B35 0%, #E55A2B 100%);
+    border: 1px solid rgba(255, 107, 53, 0.5);
+    color: white;
+    padding: 10px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 12px;
+    transition: all 0.3s ease;
+    width: 100%;
+    margin-bottom: 8px;
+}
+
+.toggle-bg-btn:hover {
+    background: linear-gradient(135deg, #E55A2B 0%, #D4491F 100%);
+    box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+    transform: translateY(-1px);
+}
+
+.control-description {
+    font-size: 11px;
+    color: #ccc;
+    font-style: italic;
+    margin: 0;
+}
+
+.crew-quarters {
+    background: linear-gradient(135deg, rgba(0, 255, 0, 0.1) 0%, rgba(0, 200, 0, 0.1) 100%);
+    border: 1px solid rgba(0, 255, 0, 0.3);
+    border-radius: 8px;
+    padding: 15px;
+}
+
+.crew-quarters h4 {
+    color: #00FF00;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+.quarters-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.quarter-item {
+    background: rgba(0, 255, 0, 0.05);
+    border: 1px solid rgba(0, 255, 0, 0.2);
+    border-radius: 4px;
+    padding: 8px;
+    font-size: 11px;
+    text-align: center;
+}
+
+.quarter-item.occupied {
+    background: rgba(0, 255, 0, 0.15);
+    border-color: rgba(0, 255, 0, 0.4);
+}
+
+/* Canvas Navigation Buttons */
+.canvas-nav-buttons {
+    position: absolute;
+    top: 15px;
+    right: 250px;
+    display: flex;
+    gap: 10px;
+    z-index: 20;
+}
+
+.nav-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid rgba(0, 191, 255, 0.8);
+    background: linear-gradient(135deg, rgba(0, 150, 255, 0.9) 0%, rgba(0, 100, 200, 0.9) 100%);
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    box-shadow:
+        0 0 15px rgba(0, 150, 255, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(5px);
+}
+
+.nav-btn:hover {
+    background: linear-gradient(135deg, rgba(0, 191, 255, 1) 0%, rgba(0, 150, 255, 1) 100%);
+    box-shadow:
+        0 0 25px rgba(0, 191, 255, 0.6),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+}
+
+.nav-btn:active {
+    transform: scale(0.95);
+    box-shadow:
+        0 0 20px rgba(0, 191, 255, 0.8),
+        inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.nav-btn:disabled {
+    background: linear-gradient(135deg, rgba(100, 100, 100, 0.6) 0%, rgba(80, 80, 80, 0.6) 100%);
+    border-color: rgba(100, 100, 100, 0.5);
+    color: rgba(255, 255, 255, 0.4);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+}
+
+.back-btn {
+    margin-right: 5px;
+}
+
+.next-btn {
+    margin-left: 5px;
+}
+
+
 #background-controls {
     position: fixed;
     bottom: 20px;
@@ -1198,6 +1467,7 @@ arrative message styling */
     font-size: 10px;
     padding: 4px 8px;
 }
+
 /*
  Story Dialog System */
 .story-dialog-overlay {
@@ -1219,16 +1489,18 @@ arrative message styling */
     border: 3px solid #00ffff;
     border-radius: 15px;
     width: 90%;
-    max-width: 1000px; /* Increased to accommodate extended area */
+    max-width: 1000px;
+    /* Increased to accommodate extended area */
     height: 250px;
-    box-shadow: 
+    box-shadow:
         0 0 30px rgba(0, 255, 255, 0.5),
         inset 0 0 20px rgba(0, 255, 255, 0.1);
     animation: dialogSlideIn 0.4s ease-out;
     overflow: visible;
     position: relative;
     /* Extended background with character area */
-    padding-left: 410px; /* Space for character on the left */
+    padding-left: 410px;
+    /* Space for character on the left */
 }
 
 
@@ -1236,7 +1508,8 @@ arrative message styling */
 .character-image {
     position: absolute;
     bottom: 0;
-    left: -180px; /* Position within the extended left area */
+    left: -180px;
+    /* Position within the extended left area */
     height: 280px;
     width: auto;
     z-index: 10001;
@@ -1252,7 +1525,7 @@ arrative message styling */
 
 .success-dialog {
     border-color: #ffd700;
-    box-shadow: 
+    box-shadow:
         0 0 30px rgba(255, 215, 0, 0.5),
         inset 0 0 20px rgba(255, 215, 0, 0.1);
 }
@@ -1260,9 +1533,12 @@ arrative message styling */
 .dialog-header {
     background: linear-gradient(90deg, rgba(0, 255, 255, 0.2), rgba(0, 255, 255, 0.1));
     padding: 20px;
-    padding-left: 0; /* Reset left padding since dialog already has padding-left */
-    margin-left: -280px; /* Extend header to cover full width including character area */
-    padding-left: 300px; /* Add padding to position content correctly */
+    padding-left: 0;
+    /* Reset left padding since dialog already has padding-left */
+    margin-left: -280px;
+    /* Extend header to cover full width including character area */
+    padding-left: 300px;
+    /* Add padding to position content correctly */
     display: flex;
     align-items: center;
     gap: 15px;
@@ -1318,7 +1594,8 @@ arrative message styling */
 
 .dialog-content {
     padding: 25px;
-    padding-left: 0; /* Reset since dialog has padding-left */
+    padding-left: 0;
+    /* Reset since dialog has padding-left */
     color: #e0e0e0;
     line-height: 1.6;
     font-size: 1.1em;
@@ -1353,9 +1630,12 @@ arrative message styling */
 
 .dialog-footer {
     padding: 20px;
-    padding-left: 0; /* Reset since dialog has padding-left */
-    margin-left: -280px; /* Extend footer to cover full width */
-    padding-left: 300px; /* Add padding to position content correctly */
+    padding-left: 0;
+    /* Reset since dialog has padding-left */
+    margin-left: -280px;
+    /* Extend footer to cover full width */
+    padding-left: 300px;
+    /* Add padding to position content correctly */
     text-align: right;
     border-top: 2px solid rgba(0, 255, 255, 0.3);
     background: rgba(0, 0, 0, 0.2);
@@ -1397,16 +1677,22 @@ arrative message styling */
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 @keyframes dialogSlideIn {
-    from { 
+    from {
         opacity: 0;
         transform: translateY(-50px) scale(0.9);
     }
-    to { 
+
+    to {
         opacity: 1;
         transform: translateY(0) scale(1);
     }
@@ -1417,6 +1703,7 @@ arrative message styling */
         opacity: 0;
         transform: translateX(-50px) scale(0.8);
     }
+
     to {
         opacity: 1;
         transform: translateX(0) scale(1);
@@ -1430,7 +1717,7 @@ arrative message styling */
         width: 95%;
         max-width: none;
     }
-    
+
     .character-image {
         left: -80px;
         height: 200px;
@@ -1444,9 +1731,163 @@ arrative message styling */
         height: 150px;
         width: 120px;
     }
-    
+
     .dialog-content {
         padding: 20px 15px;
         font-size: 1em;
     }
+}
+
+* Habitat Module Panel Styles */ .habitat-info,
+.lab-equipment,
+.storage-capacity,
+.greenhouse-stats {
+    display: grid;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.habitat-stat,
+.equipment-item,
+.capacity-item,
+.grow-stat {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background: rgba(0, 150, 255, 0.1);
+    border-radius: 6px;
+    border-left: 3px solid #00BFFF;
+}
+
+.status-active {
+    color: #00FF00;
+    font-weight: bold;
+}
+
+.status-standby {
+    color: #FFA500;
+    font-weight: bold;
+}
+
+.status-offline {
+    color: #FF4444;
+    font-weight: bold;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: 5px;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #00BFFF 0%, #00FF00 100%);
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+.research-progress h4,
+.crop-status h4 {
+    color: #00BFFF;
+    margin: 15px 0 10px 0;
+    font-size: 14px;
+}
+
+.research-item,
+.crop-item {
+    margin-bottom: 10px;
+    padding: 8px;
+    background: rgba(255, 215, 0, 0.1);
+    border-radius: 5px;
+    border-left: 3px solid #FFD700;
+}
+
+.crop-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.crop-item button {
+    background: #00FF00;
+    color: #000;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.crop-item button:hover {
+    background: #00CC00;
+}
+
+/* Module click feedback */
+#game-canvas {
+    cursor: pointer;
+}
+
+#game-canvas:hover {
+    cursor: crosshair;
+}
+
+/* Li
+ving Quarters Module Button */
+.module-button {
+    position: absolute;
+    background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
+    color: white;
+    border: 2px solid #FFD700;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-family: 'Segoe UI', monospace;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow:
+        0 0 15px rgba(255, 215, 0, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+    z-index: 100;
+    pointer-events: auto;
+}
+
+.module-button:hover {
+    background: linear-gradient(135deg, #5BA0F2 0%, #4A90E2 100%);
+    box-shadow:
+        0 0 25px rgba(255, 215, 0, 0.8),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+.module-button:active {
+    transform: translateY(0px);
+    box-shadow:
+        0 0 15px rgba(255, 215, 0, 0.6),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+#game-area {
+    position: relative;
+}
+
+#living-quarters-btn {
+    /* Position it over the Living Quarters module */
+    left: 100px;
+    /* Same as module x position */
+    top: 100px;
+    /* Same as module y position */
+    width: 150px;
+    /* Same as module width */
+    height: 100px;
+    /* Same as module height */
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }

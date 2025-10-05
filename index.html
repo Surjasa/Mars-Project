@@ -22,135 +22,190 @@
 
         <main>
             <!-- Left Sidebar Control Panel -->
-            <div id="control-panel">
+            <div id="control-panel" class="collapsed">
                 <!-- Sidebar Navigation -->
                 <div id="sidebar-nav">
-                    <div class="nav-item active" 
-                         data-panel="crew-section" 
-                         data-tooltip="Crew Status"
-                         onclick="game.switchPanel('crew-section')" 
-                         ondblclick="game.toggleSidebar()">
-                        <div class="nav-icon">👨‍🚀</div>
-                        <div class="nav-label">Crew</div>
-                    </div>
-                    <div class="nav-item" 
-                         data-panel="waste-inventory" 
-                         data-tooltip="Waste Inventory"
-                         onclick="game.switchPanel('waste-inventory')" 
-                         ondblclick="game.toggleSidebar()">
-                        <div class="nav-icon">🗑️</div>
-                        <div class="nav-label">Waste</div>
-                    </div>
-                    <div class="nav-item" 
-                         data-panel="recycling-options" 
-                         data-tooltip="Recycling Systems"
-                         onclick="game.switchPanel('recycling-options')" 
-                         ondblclick="game.toggleSidebar()">
-                        <div class="nav-icon">♻️</div>
-                        <div class="nav-label">Recycling</div>
-                    </div>
-                    <div class="nav-item" 
-                         data-panel="products-inventory" 
-                         data-tooltip="Products Inventory"
-                         onclick="game.switchPanel('products-inventory')" 
-                         ondblclick="game.toggleSidebar()">
-                        <div class="nav-icon">📦</div>
-                        <div class="nav-label">Products</div>
-                    </div>
-                    <div class="nav-item" 
-                         data-panel="background-controls" 
-                         data-tooltip="Background Settings"
-                         onclick="game.switchPanel('background-controls')" 
-                         ondblclick="game.toggleSidebar()">
-                        <div class="nav-icon">🎨</div>
-                        <div class="nav-label">Background</div>
-                    </div>
                 </div>
-
-                <!-- Content Panels -->
-                <div id="panel-content">
-                    <div id="crew-section" class="content-panel active">
-                        <div class="panel-header">
-                            <h3>👨‍🚀 Crew Status</h3>
-                            <div class="panel-subtitle">Mission Personnel</div>
-                        </div>
-                        <div id="crew-portraits"></div>
+                <div class="btn_two">
+                    <label for="check">
+                        <i class="fa-solid fa-xmark"></i>
+                    </label>
+                </div>
+                <div class="nav-item hamburger-menu" data-tooltip="Toggle Sidebar" onclick="game.toggleSidebar()">
+                    <div class="nav-icon hamburger-icon">
+                        <span></span>
+                        <span></span>
+                        <span></span>
                     </div>
-
-                    <div id="waste-inventory" class="content-panel">
-                        <div class="panel-header">
-                            <h3>🗑️ Waste Inventory</h3>
-                            <div class="panel-subtitle">Collected Materials</div>
-                        </div>
-                        <div class="waste-item">
-                            <span>Fabrics: <span id="fabric-count">0</span></span>
-                            <button onclick="game.collectWaste('fabric')">Collect</button>
-                        </div>
-                        <div class="waste-item">
-                            <span>Food Packaging: <span id="packaging-count">0</span></span>
-                            <button onclick="game.collectWaste('packaging')">Collect</button>
-                        </div>
-                        <div class="waste-item">
-                            <span>EVA Waste: <span id="eva-count">0</span></span>
-                            <button onclick="game.collectWaste('eva')">Collect</button>
-                        </div>
-                        <div class="waste-item">
-                            <span>Foam: <span id="foam-count">0</span></span>
-                            <button onclick="game.collectWaste('foam')">Collect</button>
-                        </div>
-                    </div>
-
-                    <div id="recycling-options" class="content-panel">
-                        <div class="panel-header">
-                            <h3>♻️ Recycling Systems</h3>
-                            <div class="panel-subtitle">Processing Equipment</div>
-                        </div>
-                        <div id="recycling-buttons"></div>
-                    </div>
-
-                    <div id="products-inventory" class="content-panel">
-                        <div class="panel-header">
-                            <h3>📦 Products</h3>
-                            <div class="panel-subtitle">Manufactured Items</div>
-                        </div>
-                        <div id="products-list"></div>
-                    </div>
-
-                    <div id="background-controls" class="content-panel">
-                        <div class="panel-header">
-                            <h3>🎨 Background Settings</h3>
-                            <div class="panel-subtitle">Visual Environment</div>
-                        </div>
-                        <div class="filter-controls">
-                            <label>Atmosphere:</label>
-                            <select id="atmosphere-filter" onchange="game.applyBackgroundFilter(this.value)">
-                                <option value="mars">Mars Standard</option>
-                                <option value="dust">Dust Storm</option>
-                                <option value="storm">Heavy Storm</option>
-                                <option value="clear">Clear Day</option>
-                                <option value="night">Martian Night</option>
-                            </select>
-                        </div>
-                        <div class="preset-backgrounds">
-                            <button onclick="game.loadPresetBackground('rover')">🚗 Mars Rover Scene</button>
-                            <button onclick="game.loadPresetBackground('mars1')">🏔️ Rocky Terrain</button>
-                            <button onclick="game.loadPresetBackground('mars2')">🌋 Crater View</button>
-                            <button onclick="game.loadPresetBackground('mars3')">🏜️ Desert Plains</button>
-                        </div>
-                    </div>
+                    <div class="nav-label">MENU</div>
+                </div>
+                <div class="nav-item active" data-panel="crew-section" data-tooltip="Crew Status"
+                    onclick="game.switchPanel('crew-section')">
+                    <div class="nav-icon">👨‍🚀</div>
+                    <div class="nav-label">Crew</div>
+                </div>
+                <div class="nav-item" data-panel="waste-inventory" data-tooltip="Waste Inventory"
+                    onclick="game.switchPanel('waste-inventory')">
+                    <div class="nav-icon">🗑️</div>
+                    <div class="nav-label">Waste</div>
+                </div>
+                <div class="nav-item" data-panel="recycling-options" data-tooltip="Recycling Systems"
+                    onclick="game.switchPanel('recycling-options')">
+                    <div class="nav-icon">♻️</div>
+                    <div class="nav-label">Recycling</div>
+                </div>
+                <div class="nav-item" data-panel="products-inventory" data-tooltip="Products Inventory"
+                    onclick="game.switchPanel('products-inventory')">
+                    <div class="nav-icon">📦</div>
+                    <div class="nav-label">Products</div>
+                </div>
+                <div class="nav-item" data-panel="background-controls" data-tooltip="Background Settings"
+                    onclick="game.switchPanel('background-controls')">
+                    <div class="nav-icon">🎨</div>
+                    <div class="nav-label">Background</div>
+                </div>
+                <div class="nav-item" data-panel="living-quarters" data-tooltip="Living Quarters"
+                    onclick="game.handleLivingQuartersTab()">
+                    <div class="nav-icon">🏠</div>
+                    <div class="nav-label">Living</div>
                 </div>
             </div>
 
-            <!-- Game Canvas Area -->
-            <div id="game-area">
-                <canvas id="game-canvas" width="800" height="600"></canvas>
-            </div>
-        </main>
+            <!-- Content Panels -->
+            <div id="panel-content">
+                <div id="crew-section" class="content-panel active">
+                    <div class="panel-header">
+                        <h3>👨‍🚀 Crew Status</h3>
+                        <div class="panel-subtitle">Mission Personnel</div>
+                    </div>
+                    <div id="crew-portraits"></div>
+                </div>
 
-        <div id="notifications"></div>
+                <div id="waste-inventory" class="content-panel">
+                    <div class="panel-header">
+                        <h3>🗑️ Waste Inventory</h3>
+                        <div class="panel-subtitle">Collected Materials</div>
+                    </div>
+                    <div class="waste-item">
+                        <span>Fabrics: <span id="fabric-count">0</span></span>
+                        <button onclick="game.collectWaste('fabric')">Collect</button>
+                    </div>
+                    <div class="waste-item">
+                        <span>Food Packaging: <span id="packaging-count">0</span></span>
+                        <button onclick="game.collectWaste('packaging')">Collect</button>
+                    </div>
+                    <div class="waste-item">
+                        <span>EVA Waste: <span id="eva-count">0</span></span>
+                        <button onclick="game.collectWaste('eva')">Collect</button>
+                    </div>
+                    <div class="waste-item">
+                        <span>Foam: <span id="foam-count">0</span></span>
+                        <button onclick="game.collectWaste('foam')">Collect</button>
+                    </div>
+                </div>
 
+                <div id="recycling-options" class="content-panel">
+                    <div class="panel-header">
+                        <h3>♻️ Recycling Systems</h3>
+                        <div class="panel-subtitle">Processing Equipment</div>
+                    </div>
+                    <div id="recycling-buttons"></div>
+                </div>
+
+                <div id="products-inventory" class="content-panel">
+                    <div class="panel-header">
+                        <h3>📦 Products</h3>
+                        <div class="panel-subtitle">Manufactured Items</div>
+                    </div>
+                    <div id="products-list"></div>
+                </div>
+
+                <div id="background-controls" class="content-panel">
+                    <div class="panel-header">
+                        <h3>🎨 Background Settings</h3>
+                        <div class="panel-subtitle">Visual Environment</div>
+                    </div>
+                    <div class="filter-controls">
+                        <label>Atmosphere:</label>
+                        <select id="atmosphere-filter" onchange="game.applyBackgroundFilter(this.value)">
+                            <option value="mars">Mars Standard</option>
+                            <option value="dust">Dust Storm</option>
+                            <option value="storm">Heavy Storm</option>
+                            <option value="clear">Clear Day</option>
+                            <option value="night">Martian Night</option>
+                        </select>
+                    </div>
+                    <div class="preset-backgrounds">
+                        <button onclick="game.loadPresetBackground('rover')">🚗 Mars Rover Scene</button>
+                        <button onclick="game.loadPresetBackground('mars1')">🏔️ Rocky Terrain</button>
+                        <button onclick="game.loadPresetBackground('mars2')">🌋 Crater View</button>
+                        <button onclick="game.loadPresetBackground('mars3')">🏜️ Desert Plains</button>
+                    </div>
+                </div>
+
+                <div id="living-quarters" class="content-panel">
+                    <div class="panel-header">
+                        <h3>🏠 Living Quarters</h3>
+                        <div class="panel-subtitle">Crew Habitat Management</div>
+                    </div>
+                    <div class="living-quarters-controls">
+                        <div class="habitat-status">
+                            <h4>Habitat Status</h4>
+                            <div class="status-item">
+                                <span>Temperature: <span id="habitat-temp">22°C</span></span>
+                            </div>
+                            <div class="status-item">
+                                <span>Pressure: <span id="habitat-pressure">1.0 atm</span></span>
+                            </div>
+                            <div class="status-item">
+                                <span>Oxygen: <span id="habitat-oxygen">21%</span></span>
+                            </div>
+                        </div>
+
+                        <div class="canvas-controls">
+                            <h4>Visual Controls</h4>
+                            <button onclick="game.toggleCanvasBackground()" class="toggle-bg-btn">
+                                🎨 Toggle Canvas Background
+                            </button>
+                            <p class="control-description">
+                                Hide or show the Mars landscape background on the main canvas.
+                            </p>
+                        </div>
+
+                        <div class="crew-quarters">
+                            <h4>Crew Quarters</h4>
+                            <div class="quarters-grid" id="crew-quarters-list">
+                                <!-- Crew quarters will be populated by JavaScript -->
+                            </div>
+                        </div>
+                        
+                        <div class="test-controls" style="margin-top: 20px; padding: 15px; border: 1px solid #00BFFF; border-radius: 8px;">
+                            <h4 style="color: #00BFFF; margin-bottom: 10px;">Test Controls</h4>
+                            <button onclick="game.showRecyclingBayDialogue()" style="background: #00BFFF; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-weight: bold;">
+                                Test Recycling Bay Dialogue
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
+    </div>
+
+    <!-- Game Canvas Area -->
+    <div id="game-area">
+        <canvas id="game-canvas" width="1000" height="600"></canvas>
+
+        <!-- Navigation Buttons -->
+        <div id="canvas-navigation" class="canvas-nav-buttons" style="display: none;">
+            <button id="back-btn" class="nav-btn back-btn">←</button>
+            <button id="next-btn" class="nav-btn next-btn">→</button>
         </div>
+    </div>
+    </main>
+
+    <div id="notifications"></div>
+
+    </div>
+    </div>
     </div>
 
     <script src="game.js"></script>
